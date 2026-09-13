@@ -1,23 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-
-const colors = {
-  primary: "#2C4A5E",
-  accent: "#3D8361",
-  accentLight: "#E7F2EC",
-  warning: "#C97B3D",
-  warningLight: "#FBF0E6",
-  background: "#F7F8F6",
-  surface: "#FFFFFF",
-  border: "#E2E5E1",
-  textPrimary: "#1F2937",
-  textSecondary: "#6B7280",
-};
+import Layout from "../../Layout";
+import { colors } from "../../theme";
 
 export default function StudentList() {
   // ---- TEMPORARY: one dummy row just to preview the UI. ----
   // Delete this whole array (and switch back to useState([])) once
-  
+  // you connect the real fetch below.
   const tempDummy = [
     {
       student: {
@@ -51,7 +40,7 @@ export default function StudentList() {
   const [expandedId, setExpandedId] = useState(null); // tracks which row shows guardian details
 
   // ---- Ready to enable once the backend is live. ----
-  // we will Uncomment this block and delete the two lines below it — that's
+  // Uncomment this block and delete the two lines below it — that's
   // the entire "connect to backend" step for this page.
   useEffect(() => {
     // fetch("http://localhost:5000/api/students")
@@ -87,11 +76,10 @@ export default function StudentList() {
   }
 
   return (
+    <Layout role="admin">
     <div
       style={{
         maxWidth: 900,
-        margin: "0 auto",
-        padding: 24,
         fontFamily: "sans-serif",
       }}
     >
@@ -103,7 +91,7 @@ export default function StudentList() {
           </p>
         </div>
         <Link
-          to="/students/new"
+          to="/admin/students/new"
           style={{
             padding: "8px 16px",
             background: colors.accent,
@@ -156,6 +144,7 @@ export default function StudentList() {
         )}
       </div>
     </div>
+    </Layout>
   );
 }
 

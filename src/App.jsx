@@ -1,100 +1,71 @@
-import { BrowserRouter, Routes, Route, Link, useNavigate } from "react-router-dom";
-import StudentForm from "./StudentForm";
-import StudentList from "./StudentList";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import RoleSelect from "./pages/RoleSelect";
+import Login from "./pages/auth/Login";
+import Signup from "./pages/auth/Signup";
+import AccountRecovery from "./pages/auth/AccountRecovery";
+import Profile from "./pages/profile/Profile";
 
-const colors = {
-  primary: "#2C4A5E",
-  accent: "#3D8361",
-  background: "#F7F8F6",
-  surface: "#FFFFFF",
-  border: "#E2E5E1",
-  textPrimary: "#1F2937",
-  textSecondary: "#6B7280",
-};
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import StudentForm from "./pages/admin/StudentForm";
+import StudentList from "./pages/admin/StudentList";
+
+import TeacherDashboard from "./pages/teacher/TeacherDashboard";
+import UploadMarks from "./pages/teacher/UploadMarks";
+import LessonPlan from "./pages/teacher/LessonPlan";
+import Timetable from "./pages/teacher/Timetable";
+import Attendance from "./pages/teacher/Attendance";
+import WeeklyReport from "./pages/teacher/WeeklyReport";
+
+import ClassTeacher from "./pages/ClassTeacher";
+
+import ParentDashboard from "./pages/parent/ParentDashboard";
+import Announcements from "./pages/parent/Announcements";
+import Results from "./pages/parent/Results";
+import PaymentStatus from "./pages/parent/PaymentStatus";
+import Receipts from "./pages/parent/Receipts";
+
+import BursarDashboard from "./pages/bursar/BursarDashboard";
+import CaptureMoney from "./pages/bursar/CaptureMoney";
+import PupilDetails from "./pages/bursar/PupilDetails";
+import Records from "./pages/bursar/Records";
+import UpdateStatus from "./pages/bursar/UpdateStatus";
 
 export default function App() {
   return (
     <BrowserRouter>
-      {/* This div gives every page the same colored background and full height */}
-      <div style={{ minHeight: "100vh", background: colors.background }}>
-        <TopBar />
-        <div style={{ padding: "32px 16px" }}>
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/students" element={<StudentList />} />
-            <Route path="/students/new" element={<StudentForm />} />
-          </Routes>
-        </div>
-      </div>
+      <Routes>
+        <Route path="/" element={<RoleSelect />} />
+        <Route path="/login/:role" element={<Login />} />
+        <Route path="/signup/:role" element={<Signup />} />
+        <Route path="/account-recovery/:role" element={<AccountRecovery />} />
+        <Route path="/profile/:role" element={<Profile />} />
+
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/students" element={<StudentList />} />
+        <Route path="/admin/students/new" element={<StudentForm />} />
+
+        <Route path="/teacher" element={<TeacherDashboard />} />
+        <Route path="/teacher/marks" element={<UploadMarks />} />
+        <Route path="/teacher/lesson-plan" element={<LessonPlan />} />
+        <Route path="/teacher/timetable" element={<Timetable />} />
+        <Route path="/teacher/attendance" element={<Attendance />} />
+        <Route path="/teacher/weekly-report" element={<WeeklyReport />} />
+
+        <Route path="/class-teacher" element={<ClassTeacher />} />
+
+        <Route path="/parent" element={<ParentDashboard />} />
+        <Route path="/parent/announcements" element={<Announcements />} />
+        <Route path="/parent/results" element={<Results />} />
+        <Route path="/parent/payment-status" element={<PaymentStatus />} />
+        <Route path="/parent/receipts" element={<Receipts />} />
+
+        <Route path="/bursar" element={<BursarDashboard />} />
+        <Route path="/bursar/capture-money" element={<CaptureMoney />} />
+        <Route path="/bursar/pupil-details" element={<PupilDetails />} />
+        <Route path="/bursar/records" element={<Records />} />
+        <Route path="/bursar/update-status" element={<UpdateStatus />} />
+      </Routes>
     </BrowserRouter>
-  );
-}
-
-// ---- Simple top navigation bar, shown on every page. ----
-function TopBar() {
-  return (
-    <div
-      style={{
-        background: colors.primary,
-        padding: "14px 24px",
-        display: "flex",
-        alignItems: "center",
-        gap: 24,
-      }}
-    >
-      <Link to="/" style={{ color: "white", fontWeight: 600, textDecoration: "none", fontFamily: "sans-serif" }}>
-        School Admin
-      </Link>
-      <Link to="/students" style={{ color: "#D7E4EC", textDecoration: "none", fontFamily: "sans-serif", fontSize: 14 }}>
-        Students
-      </Link>
-    </div>
-  );
-}
-
-// ---- The admin landing page. ----
-function Dashboard() {
-  const navigate = useNavigate();
-
-  return (
-    <div style={{ maxWidth: 640, margin: "0 auto", fontFamily: "sans-serif" }}>
-      <h1 style={{ color: colors.primary }}>Admin Dashboard</h1>
-      <p style={{ color: colors.textSecondary }}>Manage students from here.</p>
-
-      <div style={{ display: "flex", gap: 16, marginTop: 24 }}>
-        <DashboardCard
-          title="Add Student"
-          description="Register a new student and guardian."
-          onClick={() => navigate("/students/new")}
-        />
-        <DashboardCard
-          title="View Students"
-          description="See all students, activate or deactivate."
-          onClick={() => navigate("/students")}
-        />
-      </div>
-    </div>
-  );
-}
-
-function DashboardCard({ title, description, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        flex: 1,
-        textAlign: "left",
-        padding: 20,
-        background: colors.surface,
-        border: `1px solid ${colors.border}`,
-        borderRadius: 10,
-        cursor: "pointer",
-        fontFamily: "sans-serif",
-      }}
-    >
-      <div style={{ color: colors.primary, fontWeight: 600, fontSize: 16 }}>{title}</div>
-      <div style={{ color: colors.textSecondary, fontSize: 13, marginTop: 4 }}>{description}</div>
-    </button>
   );
 }

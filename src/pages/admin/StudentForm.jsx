@@ -1,18 +1,6 @@
 import { useState } from "react";
-
-// ---- Color palette, kept right here so this is a single, self-contained file. ----
-const colors = {
-  primary: "#2C4A5E",
-  accent: "#3D8361",
-  accentLight: "#E7F2EC",
-  warning: "#C97B3D",
-  warningLight: "#FBF0E6",
-  background: "#F7F8F6",
-  surface: "#FFFFFF",
-  border: "#E2E5E1",
-  textPrimary: "#1F2937",
-  textSecondary: "#6B7280",
-};
+import Layout from "../../Layout";
+import { colors } from "../../theme";
 
 // ---- STEP 1: one piece of state per field the backend expects. ----
 // These field names match data['student_name'], data['middle_name'], etc.
@@ -30,7 +18,6 @@ export default function StudentForm({ onCreated }) {
     date_of_birth: "",
     gender: "",       // shared with guardian right now (see note above)
     nationality: "",
-    photo: "",         // URL/path for now — file upload is a later upgrade
     email: "",
     phone_number: "",
     address: "",       // shared with guardian right now (see note above)
@@ -39,6 +26,15 @@ export default function StudentForm({ onCreated }) {
     phone: "",
     relationship: "",
   });
+
+  // Photo is kept separate from `form` because a File object can't be
+  // JSON.stringify'd like the rest of the fields. When you connect the
+  // real backend, sending a file means switching this request to
+  // FormData instead of JSON.stringify(form) — flag this to your
+  // colleague, since his current create_student() reads data['photo']
+  // as a plain string (a URL/path), not a file upload.
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(null);
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -52,6 +48,13 @@ export default function StudentForm({ onCreated }) {
     setForm((prev) => ({ ...prev, [name]: value }));
   }
 
+  function handlePhotoChange(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    setPhotoFile(file);
+    setPhotoPreview(URL.createObjectURL(file)); // temporary local preview, not uploaded anywhere yet
+  }
+
   // ---- STEP 3: submit sends the exact same shape as the form state. ----
   async function handleSubmit(e) {
     e.preventDefault();
@@ -63,6 +66,17 @@ export default function StudentForm({ onCreated }) {
       // ---- Ready to enable once the backend is live. ----
       // Uncomment this block and delete the simulated line below it —
       // that's the entire "connect to backend" step for this form.
+      //
+      // NOTE: since photoFile is an actual file (not JSON-friendly),
+      // sending it for real means switching from JSON.stringify(form)
+      // to FormData, e.g.:
+      //   const body = new FormData();
+      //   Object.entries(form).forEach(([key, value]) => body.append(key, value));
+      //   if (photoFile) body.append("photo", photoFile);
+      //   fetch(url, { method: "POST", body }); // no Content-Type header — browser sets it
+      // Your colleague's create_student() will also need to read the
+      // uploaded file (e.g. via request.files['photo']) instead of
+      // data['photo'] as a plain string.
 
       // const res = await fetch("http://localhost:5000/api/students", {
       //   method: "POST",
@@ -85,6 +99,7 @@ export default function StudentForm({ onCreated }) {
   }
 
   return (
+    <Layout role="admin">
     <form
       onSubmit={handleSubmit}
       style={{
@@ -109,8 +124,8 @@ export default function StudentForm({ onCreated }) {
         <Field label="Last name" name="last_name" value={form.last_name} onChange={handleChange} />
       </Row>
       <Row>
-        <Field label="Class" name="student_class" value={form.student_class} onChange={handleChange} placeholder="e.g. P2" />
-        <Field label="Stream" name="stream" value={form.stream} onChange={handleChange} placeholder="" />
+        <Field label="Class" name="student_class" value={form.student_class} onChange={handleChange} placeholder="e.g. S3" />
+        <Field label="Stream" name="stream" value={form.stream} onChange={handleChange} placeholder="e.g. East" />
       </Row>
       <Row>
         <Field label="Date of birth" name="date_of_birth" value={form.date_of_birth} onChange={handleChange} type="date" />
@@ -118,7 +133,9 @@ export default function StudentForm({ onCreated }) {
       </Row>
       <Row>
         <Field label="Nationality" name="nationality" value={form.nationality} onChange={handleChange} />
-        <Field label="Photo URL" name="photo" value={form.photo} onChange={handleChange} />
+        <div style={{ flex: 1 }}>
+          <PhotoField preview={photoPreview} onChange={handlePhotoChange} />
+        </div>
       </Row>
       <Row>
         <Field label="Email" name="email" value={form.email} onChange={handleChange} type="email" />
@@ -164,10 +181,11 @@ export default function StudentForm({ onCreated }) {
       )}
       {success && (
         <p style={{ color: colors.accent, marginTop: 12 }}>
-          Student saved successfully. <a href="/students">View students</a>
+          Student saved successfully. <a href="/admin/students">View students</a>
         </p>
       )}
     </form>
+    </Layout>
   );
 }
 
@@ -195,6 +213,36 @@ function SectionLabel({ children }) {
 
 function Row({ children }) {
   return <div style={{ display: "flex", gap: 12 }}>{children}</div>;
+}
+
+function PhotoField({ preview, onChange }) {
+  return (
+    <label style={{ display: "block", marginBottom: 14 }}>
+      <span style={{ display: "block", fontSize: 13, color: colors.textSecondary, marginBottom: 4 }}>
+        Photo
+      </span>
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        {preview ? (
+          <img
+            src={preview}
+            alt="Preview"
+            style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover", border: `1px solid ${colors.border}` }}
+          />
+        ) : (
+          <div
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: "50%",
+              background: colors.background,
+              border: `1px solid ${colors.border}`,
+            }}
+          />
+        )}
+        <input type="file" accept="image/*" onChange={onChange} style={{ fontSize: 13, flex: 1 }} />
+      </div>
+    </label>
+  );
 }
 
 function Field({ label, name, value, onChange, type = "text", placeholder, as, options, full }) {
