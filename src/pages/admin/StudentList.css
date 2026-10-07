@@ -1,0 +1,694 @@
+/* =====================================================
+   STUDENT LIST - same design as the Add Teacher page:
+   navy banners with clip-path hexagons, white rounded
+   cards with coloured top bars, yellow call to action,
+   dark pill buttons, green / blue / red accents.
+   ===================================================== */
+
+.student-list-content {
+    --sl-navy: #151b52;
+    --sl-navy-deep: #0f1538;
+    --sl-ink: #1a2140;
+    --sl-muted: #6f7a95;
+    --sl-blue: #1a6ce0;
+    --sl-blue-soft: #e6eefc;
+    --sl-green: #2aa52e;
+    --sl-green-soft: #e3f5e4;
+    --sl-yellow: #fbc94a;
+    --sl-yellow-dark: #efb72a;
+    --sl-red: #e0282e;
+    --sl-red-soft: #fde8e9;
+    --sl-line: #e4e8f4;
+    --sl-field: #f5f7fd;
+    --sl-radius: 18px;
+    --sl-shadow: 0 6px 18px rgba(21, 27, 82, 0.08);
+    --sl-hex: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%);
+
+    background: linear-gradient(180deg, #f1f0ff 0%, #d3e2ec 100%);
+    color: var(--sl-ink);
+    font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    padding: 28px 20px 64px;
+    min-height: 100%;
+}
+
+.student-list-content * {
+    box-sizing: border-box;
+}
+
+
+/* =====================================================
+   PAGE HEADER  (navy banner with hexagons)
+   ===================================================== */
+
+.sl-page-header {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 24px;
+    padding: 26px 30px 24px;
+    border-radius: var(--sl-radius);
+    background: var(--sl-navy);
+    color: #ffffff;
+    box-shadow: var(--sl-shadow);
+}
+
+/* big blue hexagon */
+.sl-page-header::after,
+.sl-table-header::after {
+    content: "";
+    position: absolute;
+    right: -30px;
+    top: -60px;
+    width: 220px;
+    height: 200px;
+    background: linear-gradient(135deg, #2b7cf0 0%, #1a4fb0 100%);
+    opacity: 0.45;
+    clip-path: var(--sl-hex);
+    pointer-events: none;
+}
+
+/* small yellow hexagon */
+.sl-page-header::before {
+    content: "";
+    position: absolute;
+    left: 360px;
+    bottom: -44px;
+    width: 110px;
+    height: 100px;
+    background: var(--sl-yellow);
+    opacity: 0.9;
+    clip-path: var(--sl-hex);
+    pointer-events: none;
+}
+
+.sl-table-header::before {
+    content: "";
+    position: absolute;
+    left: 240px;
+    bottom: -44px;
+    width: 110px;
+    height: 100px;
+    background: var(--sl-yellow);
+    opacity: 0.9;
+    clip-path: var(--sl-hex);
+    pointer-events: none;
+}
+
+.sl-header-text,
+.sl-page-header .sl-btn-primary,
+.sl-table-title,
+.sl-table-controls {
+    position: relative;
+    z-index: 1;
+}
+
+.sl-page-title {
+    margin: 0 0 6px;
+    font-size: 26px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.sl-page-subtitle {
+    max-width: 560px;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #b9c4f5;
+}
+
+
+/* =====================================================
+   YELLOW CALL TO ACTION
+   ===================================================== */
+
+.sl-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0 24px;
+    border: none;
+    border-radius: 12px;
+    background: var(--sl-yellow);
+    color: var(--sl-navy-deep);
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.sl-btn-primary svg {
+    width: 16px;
+    height: 16px;
+}
+
+.sl-btn-primary:hover {
+    background: var(--sl-yellow-dark);
+    transform: translateY(-1px);
+}
+
+
+/* =====================================================
+   SUMMARY CARDS  (coloured top bars)
+   ===================================================== */
+
+.sl-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.sl-stat {
+    --accent: var(--sl-blue);
+
+    padding: 24px 22px 18px;
+    border-radius: var(--sl-radius);
+    box-shadow: var(--sl-shadow);
+    background:
+            linear-gradient(var(--accent), var(--accent)) top / 100% 6px no-repeat,
+            #ffffff;
+}
+
+.sl-stat--green { --accent: var(--sl-green); }
+.sl-stat--yellow { --accent: var(--sl-yellow); }
+
+.sl-stat-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--sl-muted);
+}
+
+.sl-stat-value {
+    display: block;
+    margin-top: 4px;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--sl-ink);
+}
+
+
+/* =====================================================
+   MESSAGE
+   ===================================================== */
+
+.sl-message {
+    margin-bottom: 22px;
+    padding: 14px 18px;
+    border-left: 6px solid var(--sl-blue);
+    border-radius: 14px;
+    background: var(--sl-blue-soft);
+    color: var(--sl-navy);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    box-shadow: var(--sl-shadow);
+}
+
+.sl-message--error {
+    border-left-color: var(--sl-red);
+    background: var(--sl-red-soft);
+    color: #8f1a1e;
+}
+
+
+/* =====================================================
+   TABLE CARD
+   ===================================================== */
+
+.sl-table-card {
+    position: relative;
+    overflow: hidden;
+    padding: 0 0 12px;
+    border-radius: var(--sl-radius);
+    background: #ffffff;
+    box-shadow: var(--sl-shadow);
+}
+
+/* navy banner at the top of the card, holds the filters */
+.sl-table-header {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 18px;
+    padding: 26px 30px 24px;
+    background: var(--sl-navy);
+    color: #ffffff;
+}
+
+.sl-table-title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.sl-table-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.sl-control {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.sl-control-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #b9c4f5;
+}
+
+.sl-search-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.sl-search-input input {
+    width: 210px;
+    height: 40px;
+    padding: 0 12px 0 36px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: var(--sl-field);
+    color: var(--sl-ink);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.sl-search-input input::placeholder {
+    color: #9aa4c0;
+}
+
+.sl-search-input input:focus {
+    background: #ffffff;
+    border-color: var(--sl-blue);
+    box-shadow: 0 0 0 4px rgba(26, 108, 224, 0.14);
+}
+
+.sl-search-icon {
+    position: absolute;
+    left: 13px;
+    width: 14px;
+    height: 14px;
+    color: var(--sl-muted);
+    pointer-events: none;
+}
+
+/* select with a custom caret */
+.sl-select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 150px;
+}
+
+.sl-select-wrapper select {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    height: 40px;
+    padding: 0 36px 0 14px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background-color: var(--sl-field);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%236f7a95' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    color: var(--sl-ink);
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.sl-select-wrapper select:focus {
+    background-color: #ffffff;
+    border-color: var(--sl-blue);
+    box-shadow: 0 0 0 4px rgba(26, 108, 224, 0.14);
+}
+
+
+/* =====================================================
+   TOOLBAR  (count, clear filters, refresh, page size)
+   ===================================================== */
+
+.sl-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 0 26px 16px;
+}
+
+.sl-count {
+    color: var(--sl-muted);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.sl-toolbar-right {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.sl-page-size select {
+    height: 40px;
+}
+
+/* dark pill button (Refresh, Previous, Next) */
+.sl-dark-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 40px;
+    padding: 0 18px;
+    border: none;
+    border-radius: 12px;
+    background: var(--sl-navy-deep);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.sl-dark-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+.sl-dark-btn:hover:not(:disabled) {
+    background: var(--sl-blue);
+}
+
+.sl-dark-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* soft chip button (Clear filters) */
+.sl-chip-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 40px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 999px;
+    background: var(--sl-blue-soft);
+    color: var(--sl-blue);
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sl-chip-btn svg {
+    width: 13px;
+    height: 13px;
+}
+
+.sl-chip-btn:hover {
+    background: var(--sl-blue);
+    color: #ffffff;
+}
+
+@keyframes sl-spin {
+    to { transform: rotate(360deg); }
+}
+
+.sl-spin {
+    animation: sl-spin 0.8s linear infinite;
+}
+
+
+/* =====================================================
+   TABLE
+   ===================================================== */
+
+.sl-table-scroll {
+    padding: 0 26px 8px;
+    overflow-x: auto;
+}
+
+.sl-table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.sl-table thead th {
+    padding: 12px 14px;
+    background: var(--sl-field);
+    color: var(--sl-muted);
+    font-size: 12px;
+    font-weight: 700;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.sl-table thead th:first-child { border-radius: 12px 0 0 12px; }
+.sl-table thead th:last-child { border-radius: 0 12px 12px 0; }
+
+.sl-table tbody td {
+    padding: 14px;
+    border-bottom: 1px solid var(--sl-line);
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.sl-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.sl-table tbody tr:hover td {
+    background: #fafbff;
+}
+
+.sl-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.sl-empty-row {
+    padding: 36px 12px !important;
+    color: var(--sl-muted);
+    text-align: center;
+}
+
+.sl-capitalize {
+    text-transform: capitalize;
+}
+
+
+/* STUDENT CELL */
+
+.sl-student-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sl-avatar {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--sl-blue) 0%, var(--sl-navy) 100%);
+    box-shadow: 0 0 0 3px var(--sl-blue-soft);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.sl-student-name {
+    font-weight: 700;
+    color: var(--sl-ink);
+}
+
+.sl-student-id {
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--sl-muted);
+}
+
+/* two stacked lines (contact, guardian) */
+.sl-two-line {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sl-two-line small {
+    font-size: 12px;
+    color: var(--sl-muted);
+}
+
+
+/* BADGES */
+
+.sl-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.sl-badge--navy {
+    background: var(--sl-navy-deep);
+    color: #ffffff;
+}
+
+.sl-badge--blue {
+    background: var(--sl-blue-soft);
+    color: var(--sl-blue);
+}
+
+.sl-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.sl-status::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.sl-status--active {
+    background: var(--sl-green-soft);
+    color: #1d7d21;
+}
+
+.sl-status--inactive {
+    background: #eceef5;
+    color: var(--sl-muted);
+}
+
+
+/* =====================================================
+   PAGINATION
+   ===================================================== */
+
+.sl-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 14px 26px 6px;
+}
+
+.sl-page-info {
+    color: var(--sl-ink);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+/* =====================================================
+   FOCUS + MOTION + RESPONSIVE
+   ===================================================== */
+
+.student-list-content button:focus-visible {
+    outline: 3px solid var(--sl-blue);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .student-list-content * {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+@media (max-width: 900px) {
+    .sl-summary {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    .student-list-content {
+        padding: 20px 16px 48px;
+    }
+
+    .sl-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .sl-page-header,
+    .sl-table-header {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 22px 18px 20px;
+    }
+
+    .sl-page-header::after,
+    .sl-page-header::before,
+    .sl-table-header::after,
+    .sl-table-header::before {
+        opacity: 0.25;
+    }
+
+    .sl-table-controls,
+    .sl-control,
+    .sl-search-input input,
+    .sl-select-wrapper {
+        width: 100%;
+    }
+
+    .sl-toolbar {
+        padding: 0 14px 14px;
+    }
+
+    .sl-table-scroll {
+        padding: 0 14px 8px;
+    }
+
+    .sl-btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media print {
+    .sl-table-header::before,
+    .sl-table-header::after {
+        display: none;
+    }
+}

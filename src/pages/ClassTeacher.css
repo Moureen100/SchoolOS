@@ -1,0 +1,1722 @@
+/* =========================================================
+   SCHOOL OS - CLASS TEACHER / REPORT COMPILATION
+   Same design as the Add Teacher + Fee pages:
+   navy banners with clip-path hexagons, white rounded cards
+   with coloured top bars, yellow call to action, dark pills.
+   All class names are unchanged, so the JSX does not change.
+   ========================================================= */
+
+
+/* =========================================================
+   1. TOKENS + PAGE
+   ========================================================= */
+
+.class-teacher-page {
+    --navy: #151b52;
+    --navy-deep: #0f1538;
+    --ink: #1a2140;
+    --muted: #6f7a95;
+    --muted-light: #9aa4c0;
+    --blue: #1a6ce0;
+    --blue-soft: #e6eefc;
+    --green: #2aa52e;
+    --green-soft: #e3f5e4;
+    --yellow: #fbc94a;
+    --yellow-dark: #efb72a;
+    --yellow-soft: #fff3cf;
+    --red: #e0282e;
+    --red-soft: #fde8e9;
+    --line: #e4e8f4;
+    --field: #f5f7fd;
+    --radius: 18px;
+    --shadow: 0 6px 18px rgba(21, 27, 82, 0.08);
+    --hex: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%);
+
+    /* assessment header colours (kept from your original design) */
+    --table-navy: #151b52;
+    --table-cyan: #00ffff;
+    --table-pink: #ff9999;
+    --table-green: #00ff41;
+    --table-coral: #ff7f50;
+
+    width: 100%;
+    max-width: 1580px;
+    margin: 0 auto;
+    padding: 28px 20px 64px;
+    background: linear-gradient(180deg, #f1f0ff 0%, #d3e2ec 100%);
+    color: var(--ink);
+    font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+}
+
+.class-teacher-page *,
+.class-teacher-page *::before,
+.class-teacher-page *::after {
+    box-sizing: border-box;
+}
+
+.class-teacher-page svg {
+    flex: 0 0 auto;
+}
+
+@keyframes ct-spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes ct-rise {
+    from { opacity: 0; transform: translateY(7px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ct-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.spin {
+    animation: ct-spin 0.8s linear infinite;
+}
+
+
+/* =========================================================
+   2. HEADER BANNER (hexagons)
+   ========================================================= */
+
+.class-teacher-header {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 30px;
+    margin-bottom: 24px;
+    padding: 28px 30px 26px;
+    border-radius: var(--radius);
+    background: var(--navy);
+    color: #ffffff;
+    box-shadow: var(--shadow);
+    animation: ct-rise 0.35s ease both;
+}
+
+/* big blue hexagon */
+.class-teacher-header::after {
+    content: "";
+    position: absolute;
+    right: -30px;
+    top: -60px;
+    width: 220px;
+    height: 200px;
+    background: linear-gradient(135deg, #2b7cf0 0%, #1a4fb0 100%);
+    opacity: 0.45;
+    clip-path: var(--hex);
+    pointer-events: none;
+}
+
+/* small yellow hexagon */
+.class-teacher-header::before {
+    content: "";
+    position: absolute;
+    left: 360px;
+    bottom: -46px;
+    width: 110px;
+    height: 100px;
+    background: var(--yellow);
+    opacity: 0.9;
+    clip-path: var(--hex);
+    pointer-events: none;
+}
+
+.header-text,
+.header-stats {
+    position: relative;
+    z-index: 1;
+}
+
+.header-text {
+    min-width: 0;
+}
+
+.page-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 10px;
+    color: var(--yellow);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.page-eyebrow svg {
+    width: 14px;
+    height: 14px;
+}
+
+.class-teacher-header h1 {
+    margin: 0 0 6px;
+    color: #ffffff;
+    font-size: clamp(24px, 3vw, 28px);
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.class-teacher-header p {
+    max-width: 620px;
+    margin: 0;
+    color: #b9c4f5;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.55;
+}
+
+
+/* =========================================================
+   3. HEADER STATS
+   ========================================================= */
+
+.header-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(130px, 1fr));
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.header-stat {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 138px;
+    padding: 12px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.header-stat-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: var(--yellow);
+    color: var(--navy-deep);
+}
+
+.header-stat-icon svg {
+    width: 17px;
+    height: 17px;
+}
+
+.header-stat small {
+    display: block;
+    color: #b9c4f5;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.header-stat strong {
+    display: block;
+    margin-top: 2px;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   4. FILTERS CARD (blue top bar)
+   ========================================================= */
+
+.teacher-filters {
+    padding: 24px 22px 22px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    background:
+            linear-gradient(var(--blue), var(--blue)) top / 100% 6px no-repeat,
+            #ffffff;
+    animation: ct-rise 0.4s ease 0.04s both;
+}
+
+.filters-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    color: var(--ink);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.filters-title svg {
+    width: 15px;
+    height: 15px;
+    color: var(--blue);
+}
+
+.filters-row {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 175px;
+}
+
+.filter-field label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.filter-field label svg {
+    width: 12px;
+    height: 12px;
+    color: var(--blue);
+}
+
+.filter-field select,
+.filter-field input {
+    width: 100%;
+    height: 42px;
+    padding: 0 14px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: var(--field);
+    color: var(--ink);
+    font: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.filter-field select:focus,
+.filter-field input:focus {
+    background: #ffffff;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 4px rgba(26, 108, 224, 0.14);
+}
+
+.select-wrapper {
+    position: relative;
+}
+
+.select-wrapper select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 38px;
+    cursor: pointer;
+}
+
+.select-wrapper svg {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    width: 13px;
+    height: 13px;
+    color: var(--muted);
+    pointer-events: none;
+    transform: translateY(-50%);
+}
+
+.filter-field input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.filter-field input[type="number"]::-webkit-outer-spin-button,
+.filter-field input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+
+/* =========================================================
+   5. BUTTONS (yellow call to action)
+   ========================================================= */
+
+.load-marks-button,
+.send-report-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0 22px;
+    border: none;
+    border-radius: 12px;
+    background: var(--yellow);
+    color: var(--navy-deep);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.load-marks-button svg,
+.send-report-button svg {
+    width: 15px;
+    height: 15px;
+}
+
+.load-marks-button:hover:not(:disabled),
+.send-report-button:hover:not(:disabled) {
+    background: var(--yellow-dark);
+    transform: translateY(-1px);
+}
+
+.load-marks-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   6. ERROR
+   ========================================================= */
+
+.teacher-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    margin-top: 18px;
+    padding: 14px 18px;
+    border-left: 6px solid var(--red);
+    border-radius: 14px;
+    background: var(--red-soft);
+    color: #8f1a1e;
+    box-shadow: var(--shadow);
+    animation: ct-rise 0.25s ease both;
+}
+
+.teacher-error > svg {
+    width: 17px;
+    height: 17px;
+    margin-top: 1px;
+}
+
+.teacher-error strong {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 14px;
+}
+
+.teacher-error span {
+    display: block;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   7. SECTION LABEL (hexagon icon)
+   ========================================================= */
+
+.section-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 34px 0 16px;
+}
+
+.section-label-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 36px;
+    flex: 0 0 40px;
+    clip-path: var(--hex);
+    background: var(--yellow);
+    color: var(--navy-deep);
+}
+
+.section-label-icon svg {
+    width: 15px;
+    height: 15px;
+}
+
+.section-label div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.section-label small {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.section-label strong {
+    color: var(--ink);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.section-line {
+    flex: 1;
+    height: 1px;
+    margin-left: 6px;
+    background: rgba(21, 27, 82, 0.14);
+}
+
+
+/* =========================================================
+   8. EMPTY STATE
+   ========================================================= */
+
+.empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 130px;
+    padding: 30px;
+    border-radius: var(--radius);
+    background: #ffffff;
+    box-shadow: var(--shadow);
+    color: var(--muted);
+}
+
+.empty-state > svg {
+    width: 22px;
+    height: 22px;
+    color: var(--muted-light);
+}
+
+.empty-state strong {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.empty-state span {
+    display: block;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   9. ASSESSMENT GRID (coloured header kept)
+   ========================================================= */
+
+.assessment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+    gap: 22px;
+    align-items: start;
+}
+
+.assessment-box {
+    overflow: hidden;
+    border-radius: var(--radius);
+    background: #ffffff;
+    box-shadow: var(--shadow);
+    animation: ct-rise 0.35s ease both;
+}
+
+.assessment-box-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    min-height: 72px;
+    padding: 16px 20px;
+}
+
+.assessment-small-label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    opacity: 0.7;
+}
+
+.assessment-box-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.assessment-year {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.75);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.assessment-year svg {
+    width: 12px;
+    height: 12px;
+}
+
+.assessment-bot .assessment-box-header { background: var(--table-cyan); color: var(--table-navy); }
+.assessment-test .assessment-box-header { background: var(--table-pink); color: var(--table-navy); }
+.assessment-midterm .assessment-box-header { background: var(--table-coral); color: var(--table-navy); }
+.assessment-holiday .assessment-box-header { background: var(--table-green); color: var(--table-navy); }
+.assessment-end .assessment-box-header,
+.assessment-default .assessment-box-header { background: var(--table-navy); color: #ffffff; }
+
+.assessment-end .assessment-year,
+.assessment-default .assessment-year {
+    background: rgba(255, 255, 255, 0.14);
+}
+
+
+/* =========================================================
+   10. SUBJECT CARDS
+   ========================================================= */
+
+.submission-subject-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+    gap: 10px;
+    padding: 16px;
+}
+
+.submission-subject-card {
+    min-width: 0;
+    padding: 12px;
+    border-radius: 14px;
+    background: var(--field);
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.submission-subject-card:hover {
+    background: var(--blue-soft);
+    transform: translateY(-1px);
+}
+
+.submission-subject-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.mini-subject-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 29px;
+    clip-path: var(--hex);
+    background: var(--navy);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.submitted-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: var(--green-soft);
+    color: #1d7d21;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.submitted-status svg {
+    width: 10px;
+    height: 10px;
+}
+
+.submission-subject-name {
+    display: block;
+    overflow: hidden;
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.submission-subject-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 7px;
+    margin-top: 9px;
+    padding-top: 9px;
+    border-top: 1px dashed #c3cbe3;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.submission-subject-meta span:last-child {
+    color: var(--ink);
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   11. MARKS PANEL (table card with navy banner)
+   ========================================================= */
+
+.marks-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.marks-assessment-block {
+    overflow: hidden;
+    padding-bottom: 12px;
+    border-radius: var(--radius);
+    background: #ffffff;
+    box-shadow: var(--shadow);
+    animation: ct-rise 0.35s ease both;
+}
+
+.marks-table-header {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 20px;
+    padding: 24px 30px 22px;
+    background: var(--navy);
+    color: #ffffff;
+}
+
+/* big blue hexagon */
+.marks-table-header::after {
+    content: "";
+    position: absolute;
+    right: -30px;
+    top: -60px;
+    width: 220px;
+    height: 200px;
+    background: linear-gradient(135deg, #2b7cf0 0%, #1a4fb0 100%);
+    opacity: 0.45;
+    clip-path: var(--hex);
+    pointer-events: none;
+}
+
+/* small yellow hexagon */
+.marks-table-header::before {
+    content: "";
+    position: absolute;
+    left: 300px;
+    bottom: -44px;
+    width: 110px;
+    height: 100px;
+    background: var(--yellow);
+    opacity: 0.9;
+    clip-path: var(--hex);
+    pointer-events: none;
+}
+
+.marks-title-area,
+.marks-meta {
+    position: relative;
+    z-index: 1;
+}
+
+.marks-title-area {
+    min-width: 0;
+}
+
+.marks-assessment-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--yellow);
+    color: var(--navy-deep);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.marks-assessment-label svg {
+    width: 11px;
+    height: 11px;
+}
+
+.marks-table-header h2 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.marks-table-note {
+    margin: 5px 0 0;
+    color: #b9c4f5;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.marks-meta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.marks-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.marks-meta svg {
+    width: 12px;
+    height: 12px;
+    color: var(--yellow);
+}
+
+
+/* =========================================================
+   12. TABLE
+   ========================================================= */
+
+.marks-table-wrapper {
+    width: 100%;
+    padding: 0 26px 8px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #c3cbe3 transparent;
+}
+
+.marks-table-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.marks-table-wrapper::-webkit-scrollbar-track {
+    background: var(--field);
+    border-radius: 999px;
+}
+
+.marks-table-wrapper::-webkit-scrollbar-thumb {
+    background: #c3cbe3;
+    border-radius: 999px;
+}
+
+.marks-table {
+    width: 100%;
+    min-width: 1050px;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.marks-table th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    height: 46px;
+    padding: 0 12px;
+    background: var(--field);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.marks-table th:first-child { border-radius: 12px 0 0 12px; }
+.marks-table th:last-child { border-radius: 0 12px 12px 0; }
+
+.position-header {
+    position: sticky !important;
+    left: 0;
+    z-index: 7 !important;
+    width: 82px;
+    min-width: 82px;
+    background: var(--field) !important;
+}
+
+.student-header {
+    position: sticky !important;
+    left: 82px;
+    z-index: 7 !important;
+    min-width: 235px;
+    padding-left: 16px !important;
+    text-align: left !important;
+    background: var(--field) !important;
+}
+
+.marks-table td {
+    height: 58px;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--line);
+    background: #ffffff;
+    color: var(--ink);
+    font-size: 14px;
+    text-align: center;
+    white-space: nowrap;
+    transition: background 0.12s ease;
+}
+
+.marks-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.marks-table tbody tr:hover td {
+    background: #fafbff;
+}
+
+.marks-table tbody tr.top-row td {
+    background: #fffaf0;
+}
+
+.marks-table tbody tr.top-row:hover td {
+    background: #fff6e0;
+}
+
+.marks-table tbody tr {
+    animation: ct-fade 0.3s ease both;
+}
+
+
+/* =========================================================
+   13. POSITION (yellow hexagon badge)
+   ========================================================= */
+
+.position-cell {
+    position: sticky;
+    left: 0;
+    z-index: 4;
+    width: 82px;
+    min-width: 82px;
+    text-align: center !important;
+    background: #ffffff !important;
+}
+
+.marks-table tbody tr:hover .position-cell {
+    background: #fafbff !important;
+}
+
+.marks-table tbody tr.top-row .position-cell {
+    background: #fffaf0 !important;
+}
+
+.position-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    width: 42px;
+    height: 38px;
+    clip-path: var(--hex);
+    background: var(--yellow);
+    color: var(--navy-deep);
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.position-badge svg {
+    width: 10px;
+    height: 10px;
+}
+
+/* top 3 share the navy hexagon so they stand out */
+.position-badge.rank-1,
+.position-badge.rank-2,
+.position-badge.rank-3 {
+    background: var(--navy);
+    color: #ffffff;
+}
+
+.missing-position {
+    color: var(--muted-light);
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   14. STUDENT CELL
+   ========================================================= */
+
+.student-cell {
+    position: sticky;
+    left: 82px;
+    z-index: 4;
+    min-width: 235px;
+    padding-left: 16px !important;
+    text-align: left !important;
+    background: #ffffff !important;
+    box-shadow: 1px 0 0 var(--line);
+}
+
+.marks-table tbody tr:hover .student-cell {
+    background: #fafbff !important;
+}
+
+.marks-table tbody tr.top-row .student-cell {
+    background: #fffaf0 !important;
+}
+
+.student-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.student-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue) 0%, var(--navy) 100%);
+    box-shadow: 0 0 0 3px var(--blue-soft);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.student-cell strong {
+    display: block;
+    overflow: hidden;
+    max-width: 170px;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.student-cell small {
+    display: block;
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   15. MARK CELLS + GRADE PILLS
+   ========================================================= */
+
+.mark-cell {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+}
+
+.mark-cell strong {
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.grade-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.grade-distinction { background: var(--green-soft); color: #1d7d21; }
+.grade-credit { background: var(--blue-soft); color: var(--blue); }
+.grade-pass { background: var(--yellow-soft); color: #8a6200; }
+.grade-fail { background: var(--red-soft); color: var(--red); }
+.grade-default { background: #eceef5; color: var(--muted); }
+
+.missing-mark {
+    color: var(--muted-light);
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   16. SUMMARY COLUMNS
+   ========================================================= */
+
+.total-cell,
+.average-cell,
+.aggregate-cell {
+    background: var(--field) !important;
+    border-left: 1px solid var(--line);
+}
+
+.total-cell { min-width: 80px; }
+.average-cell { min-width: 82px; }
+.aggregate-cell { min-width: 105px; }
+
+.total-cell strong {
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.average-cell strong {
+    color: var(--blue);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.aggregate-display {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.aggregate-display strong {
+    color: var(--navy);
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.aggregate-display small {
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.missing-aggregate {
+    color: var(--muted-light);
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   17. GRADING CARD (green top bar)
+   ========================================================= */
+
+.grading-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-top: 24px;
+    padding: 26px 22px 22px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    background:
+            linear-gradient(var(--green), var(--green)) top / 100% 6px no-repeat,
+            #ffffff;
+}
+
+.grading-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 42px;
+    flex: 0 0 46px;
+    clip-path: var(--hex);
+    background: var(--green);
+    color: #ffffff;
+}
+
+.grading-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.grading-card h3 {
+    margin: 0 0 5px;
+    color: var(--ink);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.grading-card p {
+    max-width: 850px;
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   18. SEND REPORT (yellow top bar)
+   ========================================================= */
+
+.send-report-area {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    margin-top: 24px;
+    padding: 28px 24px 22px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    background:
+            linear-gradient(var(--yellow), var(--yellow)) top / 100% 6px no-repeat,
+            #ffffff;
+}
+
+.send-report-content {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.send-report-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 42px;
+    flex: 0 0 46px;
+    clip-path: var(--hex);
+    background: var(--navy);
+    color: #ffffff;
+}
+
+.send-report-icon svg {
+    width: 17px;
+    height: 17px;
+}
+
+.send-report-content h3 {
+    margin: 0 0 3px;
+    color: var(--ink);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.send-report-content p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.send-report-button {
+    min-width: 205px;
+}
+
+.send-report-button.disabled,
+.send-report-button:disabled {
+    background: var(--line);
+    color: var(--muted-light);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.waiting-message,
+.success-message {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    animation: ct-fade 0.25s ease both;
+}
+
+.waiting-message {
+    background: var(--yellow-soft);
+    color: #8a6200;
+}
+
+.success-message {
+    background: var(--green-soft);
+    color: #1d7d21;
+}
+
+.waiting-message svg,
+.success-message svg {
+    width: 12px;
+    height: 12px;
+}
+
+
+/* =========================================================
+   19. FOCUS + MOTION
+   ========================================================= */
+
+.class-teacher-page button:focus-visible,
+.class-teacher-page select:focus-visible,
+.class-teacher-page input:focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .class-teacher-page *,
+    .class-teacher-page *::before,
+    .class-teacher-page *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+
+/* =========================================================
+   20. RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1150px) {
+    .class-teacher-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .header-stats {
+        width: 100%;
+    }
+
+    .header-stat {
+        min-width: 0;
+    }
+}
+
+@media (max-width: 800px) {
+    .class-teacher-page {
+        padding: 20px 16px 48px;
+    }
+
+    .class-teacher-header {
+        padding: 22px 18px 20px;
+    }
+
+    .class-teacher-header::after,
+    .class-teacher-header::before,
+    .marks-table-header::after,
+    .marks-table-header::before {
+        opacity: 0.25;
+    }
+
+    .filters-row {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .filter-field {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .load-marks-button,
+    .send-report-button {
+        width: 100%;
+    }
+
+    .assessment-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .marks-table-header {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 22px 18px 20px;
+    }
+
+    .marks-meta {
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .marks-table-wrapper {
+        padding: 0 14px 8px;
+    }
+
+    .send-report-area {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .send-report-content {
+        align-items: flex-start;
+    }
+
+    .waiting-message,
+    .success-message {
+        align-self: flex-start;
+    }
+}
+
+@media (max-width: 560px) {
+    .header-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .submission-subject-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .marks-table {
+        min-width: 980px;
+    }
+
+    .student-header,
+    .student-cell {
+        min-width: 205px;
+    }
+
+    .position-header,
+    .position-cell {
+        width: 75px;
+        min-width: 75px;
+    }
+
+    .student-header,
+    .student-cell {
+        left: 75px;
+    }
+}
+
+
+/* =========================================================
+   21. PRINT
+   ========================================================= */
+
+@media print {
+    .class-teacher-page {
+        max-width: none;
+        padding: 0;
+        background: #ffffff;
+    }
+
+    .teacher-filters,
+    .send-report-area,
+    .grading-card,
+    .header-stats {
+        display: none !important;
+    }
+
+    .class-teacher-header,
+    .marks-assessment-block,
+    .assessment-box {
+        box-shadow: none;
+        break-inside: avoid;
+    }
+
+    .marks-table {
+        min-width: 0;
+    }
+
+    .marks-table-wrapper {
+        overflow: visible;
+    }
+
+    .position-cell,
+    .student-cell,
+    .position-header,
+    .student-header {
+        position: static;
+        box-shadow: none;
+    }
+
+    .marks-table tbody tr {
+        break-inside: avoid;
+    }
+
+    .class-teacher-page *,
+    .class-teacher-page *::before,
+    .class-teacher-page *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+
+/* =========================================================
+   22. ASSESSMENT TABS (one assessment at a time)
+   ========================================================= */
+
+.assessment-tabs {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 22px;
+    padding: 16px 22px;
+    border-radius: var(--radius);
+    background: #ffffff;
+    box-shadow: var(--shadow);
+}
+
+.assessment-tabs-label {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.assessment-tabs-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.assessment-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 999px;
+    background: var(--field);
+    color: var(--ink);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.assessment-tab::before {
+    content: "";
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--navy);
+}
+
+.assessment-tab.assessment-bot::before { background: var(--table-cyan); }
+.assessment-tab.assessment-test::before { background: var(--table-pink); }
+.assessment-tab.assessment-midterm::before { background: var(--table-coral); }
+.assessment-tab.assessment-holiday::before { background: var(--table-green); }
+
+.assessment-tab:hover {
+    background: var(--blue-soft);
+}
+
+.assessment-tab.is-active {
+    background: var(--navy);
+    color: #ffffff;
+}
+
+.assessment-tab.is-active.assessment-end::before,
+.assessment-tab.is-active.assessment-default::before {
+    background: var(--yellow);
+}
+
+
+/* =========================================================
+   23. MARKS TOOLBAR (search + page size)
+   ========================================================= */
+
+.marks-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 0 26px 16px;
+}
+
+.marks-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.marks-search svg {
+    position: absolute;
+    left: 13px;
+    width: 14px;
+    height: 14px;
+    color: var(--muted);
+    pointer-events: none;
+}
+
+.marks-search input {
+    width: 260px;
+    max-width: 100%;
+    height: 42px;
+    padding: 0 14px 0 36px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: var(--field);
+    color: var(--ink);
+    font: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.marks-search input::placeholder {
+    color: var(--muted-light);
+}
+
+.marks-search input:focus {
+    background: #ffffff;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 4px rgba(26, 108, 224, 0.14);
+}
+
+.marks-toolbar-right {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.marks-count {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.marks-page-size select {
+    height: 42px;
+    min-width: 140px;
+    padding: 0 38px 0 14px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: var(--field);
+    color: var(--ink);
+    font: inherit;
+    font-size: 14px;
+    outline: none;
+}
+
+.marks-page-size select:focus {
+    background: #ffffff;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 4px rgba(26, 108, 224, 0.14);
+}
+
+
+/* =========================================================
+   24. LONG CLASSES: TABLE SCROLLS INSIDE ITS OWN BOX
+   Header row + Position/Student columns stay in view.
+   ========================================================= */
+
+.marks-table-wrapper {
+    max-height: 70vh;
+    overflow: auto;
+}
+
+.marks-empty-row {
+    padding: 32px 12px !important;
+    color: var(--muted);
+    text-align: center !important;
+}
+
+
+/* =========================================================
+   25. PAGINATION
+   ========================================================= */
+
+.marks-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 16px 26px 6px;
+}
+
+.page-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 40px;
+    padding: 0 18px;
+    border: none;
+    border-radius: 12px;
+    background: var(--navy-deep);
+    color: #ffffff;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.page-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+.page-btn:hover:not(:disabled) {
+    background: var(--blue);
+}
+
+.page-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.page-info {
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   26. RESPONSIVE + PRINT FOR THE NEW PARTS
+   ========================================================= */
+
+@media (max-width: 800px) {
+    .marks-toolbar {
+        padding: 0 14px 14px;
+    }
+
+    .marks-search,
+    .marks-search input {
+        width: 100%;
+    }
+
+    .marks-toolbar-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .marks-pagination {
+        padding: 14px 14px 6px;
+    }
+
+    .assessment-tabs {
+        padding: 14px 16px;
+    }
+}
+
+@media print {
+    .assessment-tabs,
+    .marks-toolbar,
+    .marks-pagination {
+        display: none !important;
+    }
+
+    .marks-table-wrapper {
+        max-height: none;
+        overflow: visible;
+    }
+}

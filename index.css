@@ -1,0 +1,104 @@
+/* =========================================================
+   GLOBAL RESET
+   ========================================================= */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+/* =========================================================
+   DESIGN TOKENS
+   Shared across the app (App.css, StudentForm.css, etc.)
+   Adjust these to match your brand if needed.
+   ========================================================= */
+
+:root {
+    /* Neutral surface / text */
+    --bg: #f6f7f9;
+    --surface: #ffffff;
+    --border: #dee1e8;
+    --text: #1f2a44;
+    --text-h: #1f2a44;
+    --text-secondary: #5b6478;
+
+    /* Accent (buttons, links, focus rings, the counter demo bits) */
+    --accent: #b8863b;
+    --accent-bg: #f4ead9;
+    --accent-border: #96682a;
+
+    /* Misc used by the default Vite template's App.css */
+    --social-bg: #eef0f4;
+    --shadow: 0 4px 12px rgba(31, 42, 68, 0.08);
+
+    color-scheme: light;
+    font-family: "IBM Plex Sans", "Segoe UI", -apple-system, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* =========================================================
+   FULL-VIEWPORT ROOT
+   Makes the app fill the screen exactly, with no page-level
+   scrollbar. Individual pages (like the admin layout) are
+   responsible for their own internal scrolling if their
+   content genuinely doesn't fit.
+   ========================================================= */
+
+html,
+body,
+#root {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+}
+
+#root {
+    display: flex;
+}
+
+/* =========================================================
+   BASE ELEMENT STYLES
+   ========================================================= */
+
+a {
+    color: var(--accent);
+    text-decoration: inherit;
+}
+
+a:hover {
+    color: var(--accent-border);
+}
+
+button {
+    font-family: inherit;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    margin: 0;
+    color: var(--text-h);
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}

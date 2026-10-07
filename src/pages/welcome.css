@@ -1,0 +1,648 @@
+/* =========================================================
+   SCHOOLOS WELCOME PAGE — v5 (navy + yellow, 3D hexagons)
+   Same design language as Login.css: navy panels, clip-path
+   hexagons with a bevel highlight and shaded edge, yellow
+   call-to-action. Class names are unchanged, so the JSX
+   does not need to change.
+   ========================================================= */
+
+:root {
+    --navy: #151b52;
+    --navy-mid: #1d2766;
+    --navy-deep: #0f1538;
+
+    --blue: #1a6ce0;
+    --blue-mid: #3a8bff;
+    --blue-dark: #1a4fb0;
+    --blue-soft: #e6eefc;
+
+    --yellow: #fbc94a;
+    --yellow-light: #ffdf7a;
+    --yellow-dark: #efb72a;
+
+    --ink: #1a2140;
+    --ink-soft: #5b6685;
+    --muted-light: #b9c4f5;
+    --white: #ffffff;
+
+    --hex: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%);
+
+    /* kept so any other file using the old names still works */
+    --sky: var(--blue-mid);
+    --amber: var(--yellow);
+    --amber-light: var(--yellow-light);
+    --amber-glow: rgba(251, 201, 74, 0.3);
+    --pink: var(--blue);
+    --green: var(--yellow);
+    --teal: var(--blue-mid);
+    --purple: var(--blue);
+    --purple-deep: var(--navy);
+    --yellow-glow: rgba(251, 201, 74, 0.3);
+}
+
+/* Single-screen frame */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden !important;
+}
+
+.showcase-page.single-screen-lock {
+    background: linear-gradient(180deg, #f1f0ff 0%, #d3e2ec 100%);
+    color: var(--ink);
+    height: 100vh;
+    width: 100vw;
+    position: relative;
+    overflow: hidden !important;
+    font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+/* ---------------------------------------------------------
+   3D HEXAGONS
+   Each shape is one clip-path hexagon with three stacked
+   gradients: top-left highlight, shaded bottom edge, colour.
+   --------------------------------------------------------- */
+
+/* big blue hexagon behind the login card */
+.showcase-page.single-screen-lock::before {
+    content: "";
+    position: absolute;
+    top: -14%;
+    right: -9%;
+    width: 52%;
+    height: 98%;
+    clip-path: var(--hex);
+    background:
+            linear-gradient(145deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 38%),
+            linear-gradient(180deg, rgba(0, 0, 0, 0) 58%, rgba(0, 0, 0, 0.32) 100%),
+            linear-gradient(135deg, var(--blue-mid) 0%, var(--blue-dark) 100%);
+    opacity: 0.95;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* yellow hexagon, bottom-left */
+.showcase-page.single-screen-lock::after {
+    content: "";
+    position: absolute;
+    bottom: -16%;
+    left: -7%;
+    width: 30%;
+    height: 56%;
+    clip-path: var(--hex);
+    background:
+            linear-gradient(145deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 40%),
+            linear-gradient(180deg, rgba(0, 0, 0, 0) 58%, rgba(0, 0, 0, 0.25) 100%),
+            linear-gradient(135deg, var(--yellow-light) 0%, var(--yellow-dark) 100%);
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* small scattered shapes (inline position / size / colour still work) */
+.showcase-page.single-screen-lock .confetti-dot {
+    position: absolute;
+    clip-path: var(--hex);
+    border-radius: 0;
+    box-shadow: none;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ---------------------------------------------------------
+   NAV
+   --------------------------------------------------------- */
+
+.welcome-nav {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 40px;
+    z-index: 10;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.welcome-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.brand-mark {
+    display: flex;
+    gap: 4px;
+}
+
+.brand-mark span {
+    width: 5px;
+    height: 18px;
+    background: var(--blue);
+    border-radius: 3px;
+}
+.brand-mark span:nth-child(2) { height: 24px; background: var(--yellow); }
+.brand-mark span:nth-child(3) { height: 14px; background: var(--navy); }
+.brand-mark span:nth-child(4) { height: 20px; background: var(--blue-mid); }
+
+.brand-name {
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    line-height: 1;
+    color: var(--navy);
+}
+
+.brand-name span {
+    color: var(--blue);
+}
+
+.brand-small {
+    font-size: 0.62rem;
+    letter-spacing: 1.5px;
+    margin-top: 2px;
+    color: var(--ink-soft);
+}
+
+.nav-login {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--navy-deep);
+    border: none;
+    padding: 9px 20px;
+    border-radius: 999px;
+    color: var(--white);
+    font-size: 0.82rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(15, 21, 56, 0.25);
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    z-index: 10;
+}
+
+.nav-login:hover {
+    background: var(--yellow);
+    color: var(--navy-deep);
+    transform: translateY(-1px);
+}
+
+/* ---------------------------------------------------------
+   MAIN LAYOUT
+   --------------------------------------------------------- */
+
+.welcome-main {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+    box-sizing: border-box;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.hero-layout-wrapper {
+    display: flex;
+    gap: 50px;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-height: 100%;
+}
+
+.hero-copy {
+    flex: 1.2;
+    max-width: 650px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.hero-ai-intro {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--navy);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    letter-spacing: 1.2px;
+    color: var(--muted-light);
+    margin-bottom: 16px;
+    font-weight: 700;
+    width: fit-content;
+    box-shadow: 0 6px 14px rgba(21, 27, 82, 0.2);
+}
+
+.ai-intro-dot {
+    width: 7px;
+    height: 7px;
+    background: var(--yellow);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--yellow);
+}
+
+.hero-copy h1 {
+    font-size: clamp(2.5rem, 3.8vh, 3.8rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin: 0 0 16px 0;
+    letter-spacing: -1px;
+    color: var(--navy);
+}
+
+.hero-copy h1 span {
+    color: var(--blue);
+    display: block;
+}
+
+.hero-description {
+    font-size: clamp(0.95rem, 1.6vh, 1.1rem);
+    line-height: 1.5;
+    color: var(--ink);
+    margin: 0 0 14px 0;
+}
+
+.hero-support {
+    font-size: clamp(0.85rem, 1.4vh, 0.95rem);
+    line-height: 1.5;
+    color: var(--ink-soft);
+    margin: 0 0 24px 0;
+}
+
+.hero-inclusive {
+    background: #ffffff;
+    padding: 16px 18px;
+    border-radius: 14px;
+    border-left: 6px solid var(--yellow);
+    box-shadow: 0 8px 20px rgba(21, 27, 82, 0.1);
+}
+
+.inclusive-label {
+    font-size: 0.72rem;
+    color: var(--blue);
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.hero-inclusive p {
+    font-size: clamp(0.8rem, 1.3vh, 0.86rem);
+    line-height: 1.45;
+    color: var(--ink-soft);
+    margin: 4px 0 0 0;
+}
+
+/* ---------------------------------------------------------
+   LOGIN CARD (navy, replaces the glass card)
+   --------------------------------------------------------- */
+
+.hero-login-panel {
+    flex: 0.8;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.glass-login-card {
+    background: linear-gradient(160deg, var(--navy-mid) 0%, var(--navy) 55%, var(--navy-deep) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 82px 24px 22px 24px;
+    width: 100%;
+    max-width: 340px;
+    max-height: 86vh;
+    overflow-y: auto;
+    box-shadow: 0 26px 60px rgba(8, 12, 40, 0.45);
+    position: relative;
+    box-sizing: border-box;
+    color: var(--white);
+    z-index: 2;
+}
+
+.glass-login-card::-webkit-scrollbar { width: 5px; }
+.glass-login-card::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+.glass-login-card {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+/* yellow bar along the top edge */
+.glass-login-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: var(--yellow);
+    pointer-events: none;
+}
+
+/* ribbon badge (arrow-shaped, clip-path) */
+.glass-login-ribbon {
+    position: absolute;
+    top: 20px;
+    right: 0;
+    background: linear-gradient(135deg, var(--yellow-light) 0%, var(--yellow-dark) 100%);
+    color: var(--navy-deep);
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 6px 16px 6px 20px;
+    clip-path: polygon(14% 0, 100% 0, 100% 100%, 14% 100%, 0 50%);
+    z-index: 3;
+}
+
+/* hexagon avatar */
+.glass-login-avatar {
+    position: absolute;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 56px;
+    height: 51px;
+    clip-path: var(--hex);
+    background:
+            linear-gradient(145deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 45%),
+            linear-gradient(135deg, var(--yellow-light) 0%, var(--yellow-dark) 100%);
+    padding: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.avatar-icon-inner {
+    width: 100%;
+    height: 100%;
+    clip-path: var(--hex);
+    background: linear-gradient(160deg, var(--navy-mid), var(--navy-deep));
+    position: relative;
+    overflow: hidden;
+}
+
+.avatar-icon-inner::before {
+    content: "";
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background: var(--white);
+    border-radius: 50%;
+    top: 11px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.avatar-icon-inner::after {
+    content: "";
+    position: absolute;
+    width: 28px;
+    height: 15px;
+    background: var(--white);
+    border-radius: 50%;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.glass-login-card h2 {
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0 0 2px 0;
+    color: var(--white);
+}
+
+.glass-subtitle {
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--muted-light);
+    margin: 0 0 18px 0;
+}
+
+/* ---------------------------------------------------------
+   FORM
+   --------------------------------------------------------- */
+
+.glass-form {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+}
+
+.glass-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.glass-input-group input,
+.glass-input-group select {
+    width: 100%;
+    padding: 11px 16px 11px 40px;
+    background: rgba(8, 12, 40, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    color: var(--white);
+    font-size: 0.86rem;
+    font-family: inherit;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.glass-input-group input:focus,
+.glass-input-group select:focus {
+    border-color: var(--yellow);
+    background: rgba(8, 12, 40, 0.65);
+    box-shadow: 0 0 0 4px rgba(251, 201, 74, 0.18);
+}
+
+.glass-input-group input::placeholder {
+    color: #8e9ad0;
+}
+
+.glass-input-group select {
+    padding-right: 36px;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+/* native dropdown popup needs a dark background for white text */
+.glass-input-group select option {
+    background: var(--navy-deep);
+    color: var(--white);
+}
+
+/* custom chevron (wrap the select in .glass-input-group.select-wrap) */
+.glass-input-group.select-wrap::after {
+    content: "";
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    width: 7px;
+    height: 7px;
+    border-right: 2px solid var(--yellow);
+    border-bottom: 2px solid var(--yellow);
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+}
+
+.input-icon {
+    position: absolute;
+    left: 15px;
+    color: var(--yellow);
+    font-size: 0.88rem;
+    z-index: 1;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 14px;
+    background: none;
+    border: none;
+    color: var(--muted-light);
+    cursor: pointer;
+    font-size: 0.88rem;
+}
+
+.password-toggle:hover {
+    color: var(--white);
+}
+
+.glass-actions-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -2px;
+}
+
+.forgot-password-link {
+    font-size: 0.75rem;
+    color: var(--yellow-light);
+    cursor: pointer;
+}
+
+.forgot-password-link:hover {
+    color: var(--white);
+    text-decoration: underline;
+}
+
+/* yellow call to action */
+.glass-submit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px;
+    background: linear-gradient(180deg, #ffd868 0%, var(--yellow-dark) 100%);
+    border: none;
+    border-radius: 999px;
+    color: var(--navy-deep);
+    font-size: 0.92rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(239, 183, 42, 0.3);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.glass-submit-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 22px rgba(239, 183, 42, 0.42);
+}
+
+.glass-divider {
+    display: flex;
+    align-items: center;
+    margin: 16px 0 10px 0;
+}
+
+.glass-divider::before,
+.glass-divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.glass-divider span {
+    padding: 0 10px;
+    font-size: 0.68rem;
+    color: var(--muted-light);
+    letter-spacing: 1px;
+}
+
+/* secondary action (register) */
+.glass-secondary-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 11px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    color: var(--white);
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.glass-secondary-action:hover {
+    background: rgba(251, 201, 74, 0.14);
+    border-color: var(--yellow);
+    color: var(--yellow-light);
+}
+
+/* ---------------------------------------------------------
+   FOCUS, MOTION, SMALL SCREENS
+   --------------------------------------------------------- */
+
+.showcase-page a:focus-visible,
+.showcase-page button:focus-visible {
+    outline: 3px solid var(--yellow);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .showcase-page * {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+@media (max-width: 860px) {
+    .welcome-nav,
+    .welcome-main {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .hero-copy {
+        display: none;
+    }
+
+    .hero-login-panel {
+        justify-content: center;
+    }
+}

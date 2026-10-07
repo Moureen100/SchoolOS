@@ -1,0 +1,621 @@
+/* =====================================================
+   ADD STUDENT - same design as the Fee Management page:
+   navy banner with clip-path hexagons, white rounded
+   cards with coloured top bars, yellow call to action.
+   ===================================================== */
+
+.sf-page {
+    --navy: #151b52;
+    --navy-deep: #0f1538;
+    --ink: #1a2140;
+    --muted: #6f7a95;
+    --blue: #1a6ce0;
+    --blue-soft: #e6eefc;
+    --green: #2aa52e;
+    --green-soft: #e3f5e4;
+    --yellow: #fbc94a;
+    --yellow-dark: #efb72a;
+    --red: #e0282e;
+    --red-soft: #fde8e9;
+    --line: #e4e8f4;
+    --field: #f5f7fd;
+    --radius: 18px;
+    --shadow: 0 6px 18px rgba(21, 27, 82, 0.08);
+    --hex: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%);
+
+    background: linear-gradient(180deg, #f1f0ff 0%, #d3e2ec 100%);
+    color: var(--ink);
+    font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    padding: 28px 20px 64px;
+    min-height: 100%;
+}
+
+.sf-page * {
+    box-sizing: border-box;
+}
+
+/* =====================================================
+   HEADER BANNER (with hexagons)
+   ===================================================== */
+
+.sf-page-header {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 24px;
+    padding: 26px 30px 24px;
+    border-radius: var(--radius);
+    background: var(--navy);
+    color: #ffffff;
+    box-shadow: var(--shadow);
+}
+
+/* big blue hexagon */
+.sf-page-header::after {
+    content: "";
+    position: absolute;
+    right: -30px;
+    top: -60px;
+    width: 220px;
+    height: 200px;
+    background: linear-gradient(135deg, #2b7cf0 0%, #1a4fb0 100%);
+    opacity: 0.45;
+    clip-path: var(--hex);
+    pointer-events: none;
+}
+
+/* small yellow hexagon */
+.sf-page-header::before {
+    content: "";
+    position: absolute;
+    left: 300px;
+    bottom: -44px;
+    width: 110px;
+    height: 100px;
+    background: var(--yellow);
+    opacity: 0.9;
+    clip-path: var(--hex);
+    pointer-events: none;
+}
+
+.sf-header-text,
+.sf-id-box {
+    position: relative;
+    z-index: 1;
+}
+
+.sf-title {
+    margin: 0 0 6px;
+    font-size: 26px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.sf-subtitle {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #b9c4f5;
+}
+
+/* student id (sits where Year / Term sit on the fee page) */
+.sf-id-box {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.sf-id-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #b9c4f5;
+}
+
+.sf-id-value {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    min-width: 150px;
+    padding: 0 16px;
+    border-radius: 12px;
+    background: #ffffff;
+    color: var(--navy);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* =====================================================
+   FORM CARDS
+   ===================================================== */
+
+.sf-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+}
+
+.sf-card {
+    --accent: var(--blue);
+
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+    padding: 24px 22px 22px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    background:
+            linear-gradient(var(--accent), var(--accent)) top / 100% 6px no-repeat,
+            #ffffff;
+}
+
+.sf-card--green { --accent: var(--green); }
+.sf-card--yellow { --accent: var(--yellow); }
+
+.sf-card--wide {
+    grid-column: 1 / -1;
+}
+
+.sf-legend {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.sf-hint {
+    margin: -8px 0 0;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.sf-field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.sf-field-row--three {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* =====================================================
+   FIELDS
+   ===================================================== */
+
+.sf-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.sf-field-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.sf-input,
+.sf-select {
+    width: 100%;
+    height: 42px;
+    padding: 0 14px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background-color: var(--field);
+    color: var(--ink);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.sf-input::placeholder {
+    color: #9aa4c0;
+}
+
+.sf-select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 36px;
+    cursor: pointer;
+    text-transform: capitalize;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%236f7a95' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+}
+
+.sf-input:focus,
+.sf-select:focus {
+    background-color: #ffffff;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 4px rgba(26, 108, 224, 0.14);
+}
+
+.sf-field--invalid .sf-input,
+.sf-field--invalid .sf-select {
+    background-color: var(--red-soft);
+    border-color: var(--red);
+}
+
+/* =====================================================
+   PHOTO
+   ===================================================== */
+
+.sf-photo-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px;
+    border-radius: 14px;
+    background: var(--field);
+}
+
+.sf-photo-slot {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 76px;
+    height: 76px;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 2px dashed #c3cbe3;
+    background: #ffffff;
+    color: #9aa4c0;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.sf-photo-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sf-photo-controls {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.sf-file-input {
+    max-width: 100%;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--ink);
+}
+
+.sf-file-input::file-selector-button {
+    margin-right: 12px;
+    padding: 9px 16px;
+    border: none;
+    border-radius: 10px;
+    background: var(--blue-soft);
+    color: var(--blue);
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sf-file-input::file-selector-button:hover {
+    background: var(--blue);
+    color: #ffffff;
+}
+
+.sf-photo-hint {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.sf-photo-selected {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+/* =====================================================
+   YELLOW CALL TO ACTION
+   ===================================================== */
+
+.sf-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 46px;
+    padding: 0 22px;
+    margin-top: 4px;
+    border: none;
+    border-radius: 12px;
+    background: var(--yellow);
+    color: var(--navy-deep);
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.sf-submit:hover:not(:disabled) {
+    background: var(--yellow-dark);
+    transform: translateY(-1px);
+}
+
+.sf-submit:disabled {
+    background: var(--line);
+    color: #9aa4c0;
+    cursor: not-allowed;
+}
+
+/* =====================================================
+   MESSAGES
+   ===================================================== */
+
+.sf-message {
+    margin: 22px 0 0;
+    padding: 14px 18px;
+    border-radius: 14px;
+    border-left: 6px solid var(--blue);
+    background: var(--blue-soft);
+    color: var(--navy);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    box-shadow: var(--shadow);
+}
+
+.sf-message--success {
+    border-left-color: var(--green);
+    background: var(--green-soft);
+    color: #145c17;
+}
+
+.sf-message--error {
+    border-left-color: var(--red);
+    background: var(--red-soft);
+    color: #8f1a1e;
+}
+
+.sf-message a {
+    color: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+/* =====================================================
+   FOCUS + MOTION + RESPONSIVE
+   ===================================================== */
+
+.sf-page button:focus-visible,
+.sf-file-input:focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sf-page * { transition: none !important; }
+}
+
+@media (max-width: 900px) {
+    .sf-form-grid { grid-template-columns: 1fr; }
+    .sf-card--wide { grid-column: auto; }
+}
+
+@media (max-width: 760px) {
+    .sf-page { padding: 20px 16px 48px; }
+    .sf-field-row,
+    .sf-field-row--three { grid-template-columns: 1fr; }
+    .sf-page-header { padding: 22px 18px 20px; }
+    .sf-page-header::after,
+    .sf-page-header::before { opacity: 0.25; }
+    .sf-photo-row { flex-direction: column; align-items: flex-start; }
+}
+
+
+/* =====================================================
+   COMPATIBILITY: STYLES FOR THE ORIGINAL JSX MARKUP
+   (<form className="sf-form">, sf-header, sf-row, ...)
+   Same hexagon design, so the page looks professional
+   with either version of StudentForm.jsx.
+   ===================================================== */
+
+/* ---------- one white card, navy banner on top ---------- */
+
+.sf-form {
+    counter-reset: sf-section;
+    position: relative;
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    overflow: hidden;
+    padding: 0 32px 32px;
+    border-radius: var(--radius);
+    background: #ffffff;
+    box-shadow: var(--shadow);
+}
+
+.sf-header {
+    position: relative;
+    overflow: hidden;
+    margin: 0 -32px 8px;
+    padding: 28px 32px 26px;
+    background: var(--navy);
+    color: #ffffff;
+}
+
+/* big blue hexagon */
+.sf-header::after {
+    content: "";
+    position: absolute;
+    right: -30px;
+    top: -60px;
+    width: 220px;
+    height: 200px;
+    background: linear-gradient(135deg, #2b7cf0 0%, #1a4fb0 100%);
+    opacity: 0.45;
+    clip-path: var(--hex);
+    pointer-events: none;
+}
+
+/* small yellow hexagon */
+.sf-header::before {
+    content: "";
+    position: absolute;
+    left: 300px;
+    bottom: -44px;
+    width: 110px;
+    height: 100px;
+    background: var(--yellow);
+    opacity: 0.9;
+    clip-path: var(--hex);
+    pointer-events: none;
+}
+
+.sf-header .sf-title,
+.sf-header .sf-subtitle {
+    position: relative;
+    z-index: 1;
+}
+
+/* ---------- numbered section labels (hexagon badge) ---------- */
+
+.sf-section-label {
+    counter-increment: sf-section;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 28px 0 16px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+}
+
+.sf-header + .sf-section-label {
+    margin-top: 22px;
+    padding-top: 0;
+    border-top: none;
+}
+
+.sf-section-label::before {
+    content: counter(sf-section);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 31px;
+    clip-path: var(--hex);
+    background: var(--yellow);
+    color: var(--navy-deep);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.sf-section-label span {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.sf-section-label::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+}
+
+/* ---------- rows: two fields side by side ---------- */
+
+.sf-row {
+    display: flex;
+    gap: 16px;
+}
+
+.sf-row > .sf-field {
+    flex: 1;
+}
+
+.sf-form > .sf-field,
+.sf-form > .sf-photo-row {
+    margin-bottom: 14px;
+}
+
+.sf-form .sf-field {
+    margin-bottom: 14px;
+}
+
+.sf-field--full {
+    flex: 1 1 100%;
+}
+
+/* auto-generated Student ID */
+.sf-input[readonly] {
+    background-color: var(--blue-soft);
+    color: var(--blue);
+    font-weight: 700;
+    cursor: default;
+}
+
+/* ---------- save button (full width yellow) ---------- */
+
+.sf-form > .sf-submit {
+    display: flex;
+    width: 100%;
+    margin-top: 24px;
+}
+
+/* ---------- messages ---------- */
+
+.sf-banner {
+    margin: 18px 0 0;
+    padding: 14px 18px;
+    border-left: 6px solid var(--blue);
+    border-radius: 14px;
+    background: var(--blue-soft);
+    color: var(--navy);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.sf-banner--error {
+    border-left-color: var(--red);
+    background: var(--red-soft);
+    color: #8f1a1e;
+}
+
+.sf-banner--success {
+    border-left-color: var(--green);
+    background: var(--green-soft);
+    color: #145c17;
+}
+
+.sf-banner a {
+    color: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+@media (max-width: 700px) {
+    .sf-form { padding: 0 18px 24px; }
+
+    .sf-header {
+        margin: 0 -18px 8px;
+        padding: 22px 18px 20px;
+    }
+
+    .sf-header::after,
+    .sf-header::before { opacity: 0.25; }
+
+    .sf-row {
+        flex-direction: column;
+        gap: 0;
+    }
+}

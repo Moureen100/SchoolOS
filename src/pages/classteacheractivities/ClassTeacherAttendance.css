@@ -1,0 +1,83 @@
+
+font-size:10px; font-weight:850;
+}
+.ct-student-cell strong {
+    display:block; max-width:220px; overflow:hidden; color:#274354; font-size:11px;
+    font-weight:800; text-overflow:ellipsis; white-space:nowrap;
+}
+.ct-student-cell span { display:block; margin-top:3px; color:#8b99a3; font-size:9px; }
+.ct-id-badge,.ct-stream-badge {
+    display:inline-flex; align-items:center; min-height:25px; padding:0 8px;
+    border-radius:6px; background:#f4f7f9; color:#60727e; font-size:9px; font-weight:750;
+}
+.ct-stream-badge { background:#f4f8f5; color:#5b7567; }
+
+.ct-status-buttons { display:flex; align-items:center; gap:6px; }
+.ct-status-btn {
+    min-height:32px; padding:0 10px; border:1px solid #d9e2e7; border-radius:7px;
+    background:#fff; color:#7b8992; display:inline-flex; align-items:center;
+    justify-content:center; gap:5px; font-family:inherit; font-size:9px; font-weight:800;
+    cursor:pointer;
+}
+.ct-status-btn svg { width:13px; height:13px; }
+.ct-status-btn.present.selected { border-color:#9dd3b5; background:#effaf4; color:#2c8053; }
+.ct-status-btn.absent.selected { border-color:#e2b0b0; background:#fff3f3; color:#b65252; }
+.ct-status-btn:hover:not(:disabled) { border-color:#b8cbd5; background:#f8fafb; }
+.ct-status-btn.present.selected:hover { background:#e9f8ef; }
+.ct-status-btn.absent.selected:hover { background:#ffeded; }
+.ct-status-btn:disabled { opacity:.55; cursor:not-allowed; }
+
+.ct-table-state {
+    min-height:270px; padding:35px 20px; color:#71818d; display:flex;
+    flex-direction:column; align-items:center; justify-content:center; gap:9px; font-size:12px;
+}
+.ct-table-state > svg { width:24px; height:24px; color:#6e9bb4; }
+.ct-table-state.empty strong { color:#526876; font-size:13px; }
+.ct-table-state.empty span { color:#8a98a2; font-size:11px; }
+
+.ct-save-bar {
+    min-height:74px; padding:13px 17px; border-top:1px solid #e5ebef; background:#fbfcfd;
+    display:flex; align-items:center; justify-content:space-between; gap:18px;
+}
+.ct-save-bar strong { display:block; color:#314d5d; font-size:11px; font-weight:800; }
+.ct-save-bar span { display:block; margin-top:4px; color:#84929b; font-size:10px; }
+.ct-save-btn {
+    min-height:40px; padding:0 16px; border:1px solid #173e58; border-radius:8px;
+    background:#173e58; color:#fff; display:inline-flex; align-items:center; justify-content:center;
+    gap:8px; font-family:inherit; font-size:11px; font-weight:800; cursor:pointer;
+    box-shadow:0 4px 10px rgba(23,62,88,.13);
+}
+.ct-save-btn:hover:not(:disabled) { background:#204e6c; border-color:#204e6c; }
+.ct-save-btn:disabled { opacity:.55; cursor:not-allowed; box-shadow:none; }
+.ct-save-btn svg { width:14px; height:14px; }
+
+.ct-spin { animation:ctAttendanceSpin .9s linear infinite; }
+@keyframes ctAttendanceSpin { to { transform:rotate(360deg); } }
+
+@media (max-width:1050px) {
+    .ct-attendance-controls { grid-template-columns:1fr 1fr; }
+    .ct-control-actions { grid-column:1 / -1; justify-content:flex-start; }
+    .ct-attendance-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:760px) {
+    .ct-attendance-page { padding:20px 15px 30px; }
+    .ct-attendance-header { flex-direction:column; }
+    .ct-refresh-btn { width:100%; }
+    .ct-attendance-tabs { width:100%; overflow-x:auto; }
+    .ct-attendance-tab { min-width:85px; flex:1 0 auto; }
+    .ct-attendance-controls { grid-template-columns:1fr; }
+    .ct-control-actions { grid-column:auto; display:grid; grid-template-columns:1fr 1fr; }
+    .ct-secondary-btn { width:100%; }
+    .ct-panel-header { align-items:stretch; flex-direction:column; }
+    .ct-search { width:100%; }
+    .ct-save-bar { align-items:stretch; flex-direction:column; }
+    .ct-save-btn { width:100%; }
+}
+@media (max-width:500px) {
+    .ct-attendance-header h1 { font-size:25px; }
+    .ct-attendance-summary { grid-template-columns:1fr 1fr; gap:8px; }
+    .ct-summary-card { padding:12px; gap:8px; }
+    .ct-summary-icon { width:32px; height:32px; flex-basis:32px; }
+    .ct-summary-card strong { font-size:18px; }
+    .ct-control-actions { grid-template-columns:1fr; }
+}

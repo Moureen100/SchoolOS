@@ -1,0 +1,961 @@
+/* =====================================================
+   TEACHER MANAGEMENT - CONTENT AREA
+   Style inspired by the SMART dashboard:
+   navy header, soft blue gradient page, white rounded
+   cards with coloured top bars, yellow call-to-action,
+   dark pill buttons, green / blue / red accents.
+   Class names are the same as before, so the JSX does
+   not need to change.
+   ===================================================== */
+
+.teacher-mgmt-content {
+    --tm-navy: #151b52;
+    --tm-navy-deep: #0f1538;
+    --tm-ink: #1a2140;
+    --tm-muted: #6f7a95;
+    --tm-blue: #1a6ce0;
+    --tm-blue-soft: #e6eefc;
+    --tm-green: #2aa52e;
+    --tm-green-soft: #e3f5e4;
+    --tm-yellow: #fbc94a;
+    --tm-yellow-dark: #efb72a;
+    --tm-red: #e0282e;
+    --tm-line: #e4e8f4;
+    --tm-field: #f5f7fd;
+    --tm-radius: 18px;
+    --tm-shadow: 0 6px 18px rgba(21, 27, 82, 0.08);
+
+    background: linear-gradient(180deg, #f1f0ff 0%, #d3e2ec 100%);
+    color: var(--tm-ink);
+    font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    padding: 28px 20px 64px;
+    box-sizing: border-box;
+    min-height: 100%;
+}
+
+.teacher-mgmt-content * {
+    box-sizing: border-box;
+}
+
+
+/* =====================================================
+   PAGE HEADER  (navy banner with a hexagon shape)
+   ===================================================== */
+
+.tm-page-header {
+    position: relative;
+    overflow: hidden;
+    background: var(--tm-navy);
+    color: #ffffff;
+    border-radius: var(--tm-radius);
+    padding: 24px 30px 22px;
+    margin-bottom: 24px;
+    box-shadow: var(--tm-shadow);
+}
+
+/* decorative hexagon, cut with clip-path */
+.tm-page-header::after {
+    content: "";
+    position: absolute;
+    right: -30px;
+    top: -40px;
+    width: 220px;
+    height: 200px;
+    background: linear-gradient(135deg, #2b7cf0 0%, #1a4fb0 100%);
+    opacity: 0.45;
+    clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%);
+    pointer-events: none;
+}
+
+/* second, smaller hexagon */
+.tm-page-header::before {
+    content: "";
+    position: absolute;
+    right: 150px;
+    bottom: -38px;
+    width: 110px;
+    height: 100px;
+    background: var(--tm-yellow);
+    opacity: 0.9;
+    clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%);
+    pointer-events: none;
+}
+
+.tm-page-title {
+    position: relative;
+    z-index: 1;
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    color: #ffffff;
+}
+
+.tm-section-title {
+    position: relative;
+    z-index: 1;
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0;
+    color: #b9c4f5;
+}
+
+
+/* =====================================================
+   FORM  (three white cards, each with a coloured top bar)
+   ===================================================== */
+
+.tm-form-card {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin-bottom: 28px;
+}
+
+.tm-form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+}
+
+.tm-fieldset {
+    --accent: var(--tm-blue);
+
+    border: none;
+    margin: 0;
+    padding: 24px 22px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+    border-radius: var(--tm-radius);
+    box-shadow: var(--tm-shadow);
+
+    /* coloured bar along the top, white card below */
+    background:
+            linear-gradient(var(--accent), var(--accent)) top / 100% 6px no-repeat,
+            #ffffff;
+}
+
+.tm-fieldset:nth-child(2) {
+    --accent: var(--tm-green);
+}
+
+.tm-fieldset:nth-child(3) {
+    --accent: var(--tm-yellow);
+}
+
+.tm-fieldset legend {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--tm-ink);
+    padding: 0;
+    margin: 0 0 2px;
+}
+
+.tm-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.tm-field-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--tm-muted);
+}
+
+.tm-optional {
+    font-weight: 400;
+    color: #94a3b8;
+    font-size: 0.9em;
+}
+
+.tm-field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.tm-field input,
+.tm-field select {
+    width: 100%;
+    height: 42px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    padding: 0 14px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--tm-ink);
+    background: var(--tm-field);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+.tm-field input::placeholder {
+    color: #9aa4c0;
+}
+
+.tm-field input:focus,
+.tm-field select:focus {
+    background: #ffffff;
+    border-color: var(--tm-blue);
+    box-shadow: 0 0 0 4px rgba(26, 108, 224, 0.14);
+}
+
+.tm-field input:disabled {
+    color: var(--tm-muted);
+    cursor: not-allowed;
+}
+
+.tm-field-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.tm-field-with-icon input {
+    padding-right: 42px;
+}
+
+
+/* SELECT WITH CUSTOM CARET */
+
+.tm-select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+}
+
+.tm-select-wrapper select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 36px;
+    cursor: pointer;
+}
+
+.tm-select-caret {
+    position: absolute;
+    right: 14px;
+    font-size: 11px;
+    color: var(--tm-muted);
+    pointer-events: none;
+}
+
+.tm-select-wrapper--compact select {
+    height: 40px;
+}
+
+
+/* SUBJECT CHECK CHIPS */
+
+.tm-check-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tm-check-chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--tm-field);
+    color: var(--tm-ink);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.tm-check-chip:hover {
+    background: var(--tm-blue-soft);
+}
+
+/* hide the real checkbox, the whole chip is the button */
+.tm-field .tm-check-chip input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    padding: 0;
+    border: none;
+    pointer-events: none;
+}
+
+.tm-check-chip.is-selected {
+    background: var(--tm-navy);
+    color: #ffffff;
+}
+
+
+/* CLASS ADDER + CLASS CHIPS */
+
+.tm-class-adder {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.tm-class-adder > input {
+    flex: 1;
+    min-width: 0;
+}
+
+.tm-chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.tm-chip-list .tm-chip {
+    height: 32px;
+}
+
+
+/* PASSWORD ROW */
+
+.tm-password-row {
+    display: flex;
+    gap: 10px;
+}
+
+.tm-password-input {
+    flex: 1;
+    min-width: 0;
+}
+
+/* eye button that sits INSIDE an input */
+.tm-icon-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--tm-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    font-size: 14px;
+    border-radius: 50%;
+    transition: color 0.15s ease, background 0.15s ease;
+}
+
+.tm-icon-btn:hover {
+    color: var(--tm-ink);
+}
+
+.tm-icon-btn:disabled {
+    opacity: 0.5;
+    cursor: wait;
+}
+
+/* dark pill buttons (Add, Regenerate) like the sidebar items */
+.tm-generate-btn {
+    height: 42px;
+    padding: 0 18px;
+    border-radius: 12px;
+    border: none;
+    background: var(--tm-navy-deep);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.tm-generate-btn:hover:not(:disabled) {
+    background: var(--tm-blue);
+}
+
+.tm-generate-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+
+/* =====================================================
+   MESSAGE  (success / error)
+   ===================================================== */
+
+.tm-message {
+    margin-top: 22px;
+    padding: 14px 18px;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    word-break: break-word;
+    border-left: 6px solid var(--tm-blue);
+    background: var(--tm-blue-soft);
+    color: var(--tm-navy);
+    box-shadow: var(--tm-shadow);
+}
+
+.tm-message--success {
+    border-left-color: var(--tm-green);
+    background: var(--tm-green-soft);
+    color: #145c17;
+}
+
+.tm-message--error {
+    border-left-color: var(--tm-red);
+    background: #fde8e9;
+    color: #8f1a1e;
+}
+
+
+/* =====================================================
+   FORM ACTIONS  (white bar under the cards)
+   ===================================================== */
+
+.tm-form-actions {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-top: 22px;
+    padding: 14px 20px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: var(--tm-shadow);
+}
+
+/* yellow call to action, like "Ok! Take me there" */
+.tm-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0 24px;
+    border-radius: 12px;
+    border: none;
+    background: var(--tm-yellow);
+    color: var(--tm-navy-deep);
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.tm-btn-primary:hover:not(:disabled) {
+    background: var(--tm-yellow-dark);
+    transform: translateY(-1px);
+}
+
+.tm-btn-primary:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.tm-btn-text {
+    background: none;
+    border: none;
+    color: var(--tm-muted);
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.tm-btn-text:hover:not(:disabled) {
+    color: var(--tm-ink);
+    text-decoration: underline;
+}
+
+
+/* =====================================================
+   TABLE CARD
+   ===================================================== */
+
+.tm-table-card {
+    position: relative;
+    background: #ffffff;
+    border-radius: var(--tm-radius);
+    padding: 0 0 12px;
+    box-shadow: var(--tm-shadow);
+    overflow: hidden;
+}
+
+/* navy banner at the top of the card, same design as the page header */
+.tm-table-header {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    background: var(--tm-navy);
+    color: #ffffff;
+    padding: 26px 30px 24px;
+    margin-bottom: 22px;
+}
+
+/* big blue hexagon, cut with clip-path */
+.tm-table-header::after {
+    content: "";
+    position: absolute;
+    right: -30px;
+    top: -60px;
+    width: 220px;
+    height: 200px;
+    background: linear-gradient(135deg, #2b7cf0 0%, #1a4fb0 100%);
+    opacity: 0.45;
+    clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%);
+    pointer-events: none;
+}
+
+/* small yellow hexagon */
+.tm-table-header::before {
+    content: "";
+    position: absolute;
+    left: 240px;
+    bottom: -44px;
+    width: 110px;
+    height: 100px;
+    background: var(--tm-yellow);
+    opacity: 0.9;
+    clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%);
+    pointer-events: none;
+}
+
+.tm-table-title {
+    position: relative;
+    z-index: 1;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+    color: #ffffff;
+}
+
+/* keep the filters above the hexagons */
+.tm-table-controls {
+    position: relative;
+    z-index: 1;
+}
+
+.tm-table-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.tm-control {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.tm-control-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #b9c4f5;
+}
+
+.tm-search-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.tm-search-input input {
+    height: 40px;
+    width: 190px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    padding: 0 12px 0 36px;
+    font-size: 14px;
+    font-family: inherit;
+    background: var(--tm-field);
+    color: var(--tm-ink);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+.tm-search-input input:focus {
+    background: #ffffff;
+    border-color: var(--tm-blue);
+    box-shadow: 0 0 0 4px rgba(26, 108, 224, 0.14);
+}
+
+.tm-search-icon {
+    position: absolute;
+    left: 13px;
+    font-size: 13px;
+    color: var(--tm-muted);
+}
+
+.tm-chip-select {
+    min-width: 160px;
+}
+
+.tm-chip-select .tm-select-wrapper select {
+    width: 100%;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    padding: 0 36px 0 14px;
+    font-size: 14px;
+    font-family: inherit;
+    background: var(--tm-field);
+    color: var(--tm-ink);
+    outline: none;
+}
+
+.tm-control .tm-select-wrapper select {
+    width: 100%;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    padding: 0 36px 0 14px;
+    font-size: 14px;
+    font-family: inherit;
+    background: var(--tm-field);
+    color: var(--tm-ink);
+    outline: none;
+}
+
+.tm-control .tm-select-wrapper select:focus {
+    background: #ffffff;
+    border-color: var(--tm-blue);
+    box-shadow: 0 0 0 4px rgba(26, 108, 224, 0.14);
+}
+
+/* selected filter / class chip */
+.tm-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 10px 0 14px;
+    border-radius: 999px;
+    background: var(--tm-blue-soft);
+    color: var(--tm-blue);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.tm-chip button {
+    background: var(--tm-blue);
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 9px;
+    padding: 0;
+}
+
+.tm-chip button:hover {
+    background: var(--tm-navy);
+}
+
+
+/* =====================================================
+   TABLE
+   ===================================================== */
+
+.tm-table-scroll {
+    overflow-x: auto;
+    padding: 0 26px 8px;
+}
+
+.tm-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 900px;
+}
+
+.tm-table thead th {
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--tm-muted);
+    background: var(--tm-field);
+    padding: 12px 14px;
+    white-space: nowrap;
+}
+
+.tm-table thead th:first-child {
+    border-radius: 12px 0 0 12px;
+}
+
+.tm-table thead th:last-child {
+    border-radius: 0 12px 12px 0;
+}
+
+.tm-table tbody td {
+    padding: 16px 14px;
+    border-bottom: 1px solid var(--tm-line);
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.tm-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.tm-table tbody tr:hover td {
+    background: #fafbff;
+}
+
+.tm-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.tm-actions-col {
+    width: 100px;
+}
+
+.tm-empty-row {
+    text-align: center;
+    color: var(--tm-muted);
+    padding: 32px 12px !important;
+}
+
+
+/* TEACHER CELL */
+
+.tm-teacher-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.tm-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--tm-blue) 0%, var(--tm-navy) 100%);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 700;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 3px var(--tm-blue-soft);
+}
+
+.tm-teacher-name {
+    font-weight: 700;
+    color: var(--tm-ink);
+}
+
+.tm-teacher-email {
+    font-size: 12px;
+    color: var(--tm-muted);
+    margin-top: 2px;
+}
+
+
+/* CREDENTIALS CELL  (dark pill, like the sidebar buttons) */
+
+.tm-credentials-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px 6px 14px;
+    border-radius: 999px;
+    background: var(--tm-navy-deep);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.tm-credentials-sep {
+    color: #6f7fb8;
+}
+
+.tm-password-dots {
+    letter-spacing: 1px;
+    color: var(--tm-yellow);
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 13px;
+}
+
+/* small round buttons inside the pill (eye + reset) */
+.tm-icon-btn--muted {
+    position: static;
+    transform: none;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    color: #c9d3ff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.tm-icon-btn--muted:hover {
+    color: var(--tm-navy-deep);
+    background: var(--tm-yellow);
+}
+
+
+/* STATUS BADGE */
+
+.tm-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    border-radius: 999px;
+    padding: 7px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.tm-status-badge:hover {
+    transform: translateY(-1px);
+}
+
+.tm-status-badge::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.tm-status-badge.is-active {
+    background: var(--tm-green-soft);
+    color: #1d7d21;
+}
+
+.tm-status-badge.is-inactive {
+    background: #eceef5;
+    color: var(--tm-muted);
+}
+
+
+/* ROW ACTIONS */
+
+.tm-row-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tm-icon-btn--edit,
+.tm-icon-btn--delete {
+    position: static;
+    transform: none;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.tm-icon-btn--edit {
+    color: var(--tm-blue);
+    background: var(--tm-blue-soft);
+}
+
+.tm-icon-btn--edit:hover {
+    color: #ffffff;
+    background: var(--tm-blue);
+}
+
+.tm-icon-btn--delete {
+    color: var(--tm-red);
+    background: #fde8e9;
+}
+
+.tm-icon-btn--delete:hover {
+    color: #ffffff;
+    background: var(--tm-red);
+}
+
+
+/* =====================================================
+   KEYBOARD FOCUS + REDUCED MOTION
+   ===================================================== */
+
+.teacher-mgmt-content button:focus-visible {
+    outline: 3px solid var(--tm-blue);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .teacher-mgmt-content * {
+        transition: none !important;
+    }
+}
+
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 1180px) {
+    .tm-form-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    .teacher-mgmt-content {
+        padding: 20px 16px 48px;
+    }
+
+    .tm-page-header::after,
+    .tm-page-header::before,
+    .tm-table-header::after,
+    .tm-table-header::before {
+        opacity: 0.25;
+    }
+
+    .tm-table-header {
+        padding: 22px 18px 20px;
+    }
+
+    .tm-table-scroll {
+        padding: 0 14px 8px;
+    }
+
+    .tm-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tm-field-row {
+        grid-template-columns: 1fr;
+    }
+
+    .tm-class-adder {
+        flex-wrap: wrap;
+    }
+
+    .tm-table-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .tm-search-input input {
+        width: 100%;
+    }
+
+    .tm-form-actions {
+        flex-wrap: wrap;
+    }
+}

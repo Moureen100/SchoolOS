@@ -1,0 +1,553 @@
+/* =========================================================
+       UPLOAD MARKS PAGE
+       ========================================================= */
+
+.upload-marks-page {
+    padding: 24px;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.upload-marks-header {
+    margin-bottom: 24px;
+}
+
+.upload-marks-header h1 {
+    margin: 0;
+    font-size: 24px;
+    color: var(--text-primary, #1f2937);
+}
+
+.upload-marks-header p {
+    margin-top: 6px;
+    margin-bottom: 0;
+    color: var(--text-secondary, #6b7280);
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   FILTER CARD
+   ========================================================= */
+
+.upload-marks-filter-card {
+    background: var(--surface, #ffffff);
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 20px;
+
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+
+/* =========================================================
+   FILTER FIELD
+   ========================================================= */
+
+.upload-marks-filter-field {
+    display: block;
+    font-size: 13px;
+    color: var(--text-secondary, #6b7280);
+}
+
+.upload-marks-filter-field > span {
+    display: block;
+    margin-bottom: 4px;
+}
+
+
+/* =========================================================
+   SELECT
+   ========================================================= */
+
+.upload-marks-select {
+    padding: 8px 10px;
+
+    border: 1px solid var(--border, #d1d5db);
+    border-radius: 6px;
+
+    font-size: 14px;
+    height: 36px;
+
+    background: #ffffff;
+    color: var(--text-primary, #1f2937);
+
+    min-width: 150px;
+
+    outline: none;
+}
+
+.upload-marks-select:focus {
+    border-color: var(--primary, #163a30);
+}
+
+
+/* =========================================================
+   LOAD BUTTON
+   ========================================================= */
+
+.upload-marks-load-btn {
+    height: 36px;
+    padding: 0 16px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: var(--primary, #163a30);
+    color: #ffffff;
+
+    cursor: pointer;
+
+    font-size: 14px;
+}
+
+.upload-marks-load-btn:hover:not(:disabled) {
+    opacity: 0.9;
+}
+
+.upload-marks-load-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+
+/* =========================================================
+   RESET BUTTON
+   ========================================================= */
+
+.upload-marks-reset-btn {
+    height: 36px;
+    padding: 0 14px;
+
+    border: 1px solid var(--border, #d1d5db);
+    border-radius: 6px;
+
+    background: #ffffff;
+    color: var(--text-primary, #1f2937);
+
+    cursor: pointer;
+
+    font-size: 14px;
+}
+
+.upload-marks-reset-btn:hover {
+    background: #f8fafc;
+}
+
+
+/* =========================================================
+   INFO MESSAGE
+   ========================================================= */
+
+.upload-marks-info {
+    margin-bottom: 14px;
+
+    padding: 10px 14px;
+
+    border-radius: 7px;
+
+    background: #f3f7f5;
+    color: var(--text-primary, #1f2937);
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   ERROR MESSAGE
+   ========================================================= */
+
+.upload-marks-error {
+    margin-bottom: 14px;
+
+    padding: 10px 14px;
+
+    border-radius: 7px;
+
+    background: #fff3f2;
+    color: #b42318;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   SUCCESS MESSAGE
+   ========================================================= */
+
+.upload-marks-success {
+    margin-bottom: 14px;
+
+    padding: 10px 14px;
+
+    border-radius: 7px;
+
+    background: #ecfdf3;
+    color: #027a48;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   TABLE CARD
+   ========================================================= */
+
+.upload-marks-table-card {
+    background: #ffffff;
+
+    border: 1px solid var(--border, #e5e7eb);
+
+    border-radius: 10px;
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   TABLE HEADER
+   ========================================================= */
+
+.upload-marks-table-header {
+    padding: 16px 18px;
+
+    border-bottom:
+            1px solid var(--border, #e5e7eb);
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 12px;
+
+    flex-wrap: wrap;
+}
+
+
+/* =========================================================
+   SUBJECT
+   ========================================================= */
+
+.upload-marks-subject {
+    font-size: 16px;
+
+    font-weight: 600;
+
+    color:
+            var(--text-primary, #1f2937);
+}
+
+
+/* =========================================================
+   TABLE META
+   ========================================================= */
+
+.upload-marks-meta {
+    margin-top: 3px;
+
+    font-size: 13px;
+
+    color:
+            var(--text-secondary, #6b7280);
+}
+
+
+/* =========================================================
+   PUPIL COUNT
+   ========================================================= */
+
+.upload-marks-pupil-count {
+    font-size: 13px;
+
+    color:
+            var(--text-secondary, #6b7280);
+}
+
+
+/* =========================================================
+   TABLE WRAPPER
+   ========================================================= */
+
+.upload-marks-table-wrapper {
+    overflow-x: auto;
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.upload-marks-table {
+    width: 100%;
+
+    border-collapse: collapse;
+}
+
+
+/* =========================================================
+   TABLE HEADER
+   ========================================================= */
+
+.upload-marks-table thead tr {
+    border-bottom:
+            1px solid var(--border, #e5e7eb);
+}
+
+.upload-marks-table th {
+    padding: 10px 16px;
+
+    font-size: 13px;
+
+    color:
+            var(--text-secondary, #6b7280);
+
+    text-align: left;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   TABLE ROW
+   ========================================================= */
+
+.upload-marks-table tbody tr {
+    border-bottom:
+            1px solid var(--border, #e5e7eb);
+}
+
+.upload-marks-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.upload-marks-table tbody tr:hover {
+    background: #fafafa;
+}
+
+
+/* =========================================================
+   TABLE CELLS
+   ========================================================= */
+
+.upload-marks-table td {
+    padding: 10px 16px;
+
+    font-size: 14px;
+
+    color:
+            var(--text-primary, #1f2937);
+}
+
+
+/* =========================================================
+   SCORE INPUT
+   ========================================================= */
+
+.upload-marks-score-input {
+    width: 90px;
+
+    padding: 8px 10px;
+
+    border:
+            1px solid var(--border, #d1d5db);
+
+    border-radius: 6px;
+
+    font-size: 14px;
+
+    background: #ffffff;
+
+    outline: none;
+}
+
+.upload-marks-score-input:focus {
+    border-color:
+            var(--primary, #163a30);
+}
+
+
+/* =========================================================
+   GRADE SELECT
+   ========================================================= */
+
+.upload-marks-grade-select {
+    padding: 8px 10px;
+
+    border:
+            1px solid var(--border, #d1d5db);
+
+    border-radius: 6px;
+
+    font-size: 14px;
+
+    height: 36px;
+
+    background: #ffffff;
+
+    outline: none;
+}
+
+.upload-marks-grade-select:focus {
+    border-color:
+            var(--primary, #163a30);
+}
+
+
+/* =========================================================
+   LOCKED FIELDS
+   ========================================================= */
+
+.upload-marks-score-input.locked,
+.upload-marks-grade-select.locked {
+    background: #f5f5f5;
+
+    cursor: not-allowed;
+
+    color: #6b7280;
+}
+
+
+/* =========================================================
+   STATUS BADGES
+   ========================================================= */
+
+.upload-marks-status {
+    display: inline-block;
+
+    font-size: 12px;
+
+    padding: 5px 8px;
+
+    border-radius: 20px;
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   UPLOADED
+   ========================================================= */
+
+.upload-marks-status.uploaded {
+    background: #ecfdf3;
+
+    color: #027a48;
+}
+
+
+/* =========================================================
+   PENDING
+   ========================================================= */
+
+.upload-marks-status.pending {
+    background: #fff7ed;
+
+    color: #c2410c;
+}
+
+
+/* =========================================================
+   SAVE FOOTER
+   ========================================================= */
+
+.upload-marks-save-footer {
+    padding: 14px 18px;
+
+    border-top:
+            1px solid var(--border, #e5e7eb);
+
+    display: flex;
+
+    justify-content: flex-end;
+}
+
+
+/* =========================================================
+   SAVE BUTTON
+   ========================================================= */
+
+.upload-marks-save-btn {
+    padding: 10px 18px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background:
+            var(--primary, #163a30);
+
+    color: #ffffff;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+.upload-marks-save-btn:hover:not(:disabled) {
+    opacity: 0.9;
+}
+
+.upload-marks-save-btn:disabled {
+    cursor: not-allowed;
+
+    opacity: 0.6;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .upload-marks-page {
+        padding: 16px;
+    }
+
+    .upload-marks-filter-card {
+        align-items: stretch;
+    }
+
+    .upload-marks-filter-field {
+        width: 100%;
+    }
+
+    .upload-marks-select {
+        width: 100%;
+    }
+
+    .upload-marks-load-btn,
+    .upload-marks-reset-btn {
+        width: 100%;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL SCREENS
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .upload-marks-header h1 {
+        font-size: 21px;
+    }
+
+    .upload-marks-table th,
+    .upload-marks-table td {
+        padding: 9px 12px;
+    }
+
+}

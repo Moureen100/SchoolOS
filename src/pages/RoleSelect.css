@@ -1,0 +1,476 @@
+/* =========================================================
+   ROLE PAGE — navy + yellow, 3D hexagons
+   Same design language as Login.css and WelcomePage.css.
+   Class names are unchanged, so the JSX does not change.
+   ========================================================= */
+
+.role-page {
+    --navy: #151b52;
+    --navy-mid: #1d2766;
+    --navy-deep: #0f1538;
+    --blue: #1a6ce0;
+    --blue-mid: #3a8bff;
+    --blue-dark: #1a4fb0;
+    --blue-soft: #e6eefc;
+    --yellow: #fbc94a;
+    --yellow-light: #ffdf7a;
+    --yellow-dark: #efb72a;
+    --ink: #1a2140;
+    --muted: #6f7a95;
+    --hex: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%);
+
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: linear-gradient(180deg, #f1f0ff 0%, #d3e2ec 100%);
+}
+
+@media (max-width: 1024px) {
+    .role-page {
+        flex-direction: column;
+    }
+}
+
+
+/* =========================================================
+   TOP-RIGHT 3D HEXAGONS (replace the old circles)
+   ========================================================= */
+
+.role-page::before {
+    content: "";
+    position: absolute;
+    top: -70px;
+    right: -60px;
+    width: 220px;
+    height: 200px;
+    clip-path: var(--hex);
+    background:
+            linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 40%),
+            linear-gradient(180deg, rgba(0, 0, 0, 0) 58%, rgba(0, 0, 0, 0.3) 100%),
+            linear-gradient(135deg, var(--blue-mid) 0%, var(--blue-dark) 100%);
+    opacity: 0.85;
+    z-index: 20;
+    pointer-events: none;
+}
+
+.role-page::after {
+    content: "";
+    position: absolute;
+    top: 70px;
+    right: 120px;
+    width: 74px;
+    height: 67px;
+    clip-path: var(--hex);
+    background:
+            linear-gradient(145deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 40%),
+            linear-gradient(180deg, rgba(0, 0, 0, 0) 58%, rgba(0, 0, 0, 0.25) 100%),
+            linear-gradient(135deg, var(--yellow-light) 0%, var(--yellow-dark) 100%);
+    opacity: 0.95;
+    z-index: 21;
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   LEFT SIDE
+   ========================================================= */
+
+.role-hero {
+    position: relative;
+    flex: 0 0 45%;
+    min-width: 420px;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 64px 56px;
+    overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+    .role-hero {
+        flex-basis: auto;
+        min-width: 0;
+        width: 100%;
+        height: 380px;
+        padding: 40px 32px;
+    }
+}
+
+
+/* =========================================================
+   GEOMETRIC BRAND LAYERS
+   Navy panel with a yellow trim line behind it, both cut
+   with clip-path. A bevel highlight gives the 3D edge.
+   ========================================================= */
+
+.brand-geometric-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.brand-geometric-layer--primary {
+    background:
+            linear-gradient(145deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 35%),
+            linear-gradient(135deg, var(--navy-mid) 0%, var(--navy) 55%, var(--navy-deep) 100%);
+    clip-path: polygon(0 0, 75% 0, 100% 50%, 75% 100%, 0 100%);
+    z-index: 1;
+}
+
+.brand-geometric-layer--accent {
+    background: linear-gradient(135deg, var(--yellow-light) 0%, var(--yellow-dark) 100%);
+    clip-path: polygon(0 0, 77% 0, 102% 50%, 77% 100%, 0 100%);
+    z-index: 0;
+    width: 101.5%;
+}
+
+@media (max-width: 1024px) {
+    .brand-geometric-layer--primary {
+        clip-path: polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%);
+    }
+
+    .brand-geometric-layer--accent {
+        clip-path: polygon(0 0, 100% 0, 100% 77%, 50% 102%, 0 77%);
+        width: 100%;
+    }
+}
+
+
+/* =========================================================
+   HERO CONTENT
+   ========================================================= */
+
+.role-hero__content {
+    position: relative;
+    z-index: 5;
+    max-width: 320px;
+    margin-bottom: 40px;
+}
+
+.role-hero__content h1 {
+    margin: 0 0 12px;
+    font-size: 42px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+}
+
+.role-hero__content p {
+    margin: 0;
+    color: #b9c4f5;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   FLOATING HEXAGON FRAMES (were round portholes)
+   The image is cut into a hexagon; an overlay adds the
+   top-left highlight and shaded bottom edge for depth.
+   ========================================================= */
+
+.role-hero__window {
+    position: absolute;
+    clip-path: var(--hex);
+    overflow: hidden;
+    z-index: 4;
+    background: linear-gradient(135deg, var(--blue-mid), var(--navy));
+    transition: transform 0.3s ease;
+}
+
+.role-hero__window::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+            linear-gradient(145deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 40%),
+            linear-gradient(180deg, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 0.35) 100%);
+    pointer-events: none;
+}
+
+.role-hero__window:hover {
+    transform: scale(1.04);
+}
+
+.role-hero__window img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.role-hero__window--large {
+    width: 260px;
+    height: 234px;
+    right: 30px;
+    bottom: -30px;
+}
+
+.role-hero__window--small {
+    width: 130px;
+    height: 117px;
+    left: 40px;
+    top: 40px;
+}
+
+@media (max-width: 1024px) {
+    .role-hero__window--large {
+        width: 150px;
+        height: 135px;
+        right: 20px;
+        bottom: 10px;
+    }
+
+    .role-hero__window--small {
+        width: 90px;
+        height: 81px;
+        left: unset;
+        right: 180px;
+        top: 20px;
+    }
+}
+
+
+/* =========================================================
+   RIGHT SIDE
+   ========================================================= */
+
+.role-select {
+    /* role colours, same accents as the teacher section */
+    --tone-coral: #e0282e;
+    --tone-coral-soft: rgba(224, 40, 46, 0.07);
+
+    --tone-teal: #2aa52e;
+    --tone-teal-soft: rgba(42, 165, 46, 0.07);
+
+    --tone-violet: #3a3f9e;
+    --tone-violet-soft: rgba(58, 63, 158, 0.07);
+
+    --tone-accent: #1a6ce0;
+    --tone-accent-soft: rgba(26, 108, 224, 0.07);
+
+    --tone-amber: #efb72a;
+    --tone-amber-soft: rgba(239, 183, 42, 0.12);
+
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    padding: 60px 40px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+
+/* =========================================================
+   ROLE SELECT HERO
+   ========================================================= */
+
+.role-select__hero {
+    text-align: center;
+    max-width: 480px;
+}
+
+.role-select__hero h2 {
+    margin: 0 0 10px;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    color: var(--navy);
+}
+
+.role-select__hero p {
+    margin: 0;
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   ROLE GRID
+   ========================================================= */
+
+.role-select__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(260px, 340px));
+    gap: 20px;
+    width: 100%;
+    max-width: 700px;
+}
+
+@media (max-width: 680px) {
+    .role-select__grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* =========================================================
+   ROLE CARD  (white card with a coloured top bar)
+   ========================================================= */
+
+.role-card {
+    position: relative;
+    appearance: none;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid transparent;
+    border-radius: 18px;
+    padding: 28px 24px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    text-align: left;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+    box-shadow: 0 6px 18px rgba(21, 27, 82, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+/* coloured bar along the top, uses the role's tone */
+.role-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: var(--tone);
+}
+
+.role-card:hover {
+    border-color: var(--tone);
+    background-color: #ffffff;
+    background-image: linear-gradient(var(--tone-soft), var(--tone-soft));
+    transform: translateY(-3px);
+    box-shadow: 0 16px 30px rgba(21, 27, 82, 0.14);
+}
+
+.role-card:focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: 3px;
+}
+
+
+/* =========================================================
+   ROLE COLOUR MAPPINGS
+   ========================================================= */
+
+.role-card--coral {
+    --tone: var(--tone-coral);
+    --tone-soft: var(--tone-coral-soft);
+}
+
+.role-card--teal {
+    --tone: var(--tone-teal);
+    --tone-soft: var(--tone-teal-soft);
+}
+
+.role-card--violet {
+    --tone: var(--tone-violet);
+    --tone-soft: var(--tone-violet-soft);
+}
+
+.role-card--accent {
+    --tone: var(--tone-accent);
+    --tone-soft: var(--tone-accent-soft);
+}
+
+.role-card--amber {
+    --tone: var(--tone-amber);
+    --tone-soft: var(--tone-amber-soft);
+}
+
+
+/* =========================================================
+   3D HEXAGON ICON (was the round porthole)
+   ========================================================= */
+
+.role-card__porthole {
+    flex: 0 0 auto;
+    position: relative;
+    width: 54px;
+    height: 49px;
+    clip-path: var(--hex);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+            linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 42%),
+            linear-gradient(180deg, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.3) 100%),
+            linear-gradient(135deg, var(--tone) 0%, var(--navy-deep) 100%);
+}
+
+.role-card__icon {
+    font-size: 18px;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* =========================================================
+   CARD TEXT
+   ========================================================= */
+
+.role-card__text {
+    display: flex;
+    flex-direction: column;
+}
+
+.role-card__title {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--navy);
+}
+
+.role-card__blurb {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 5px;
+    line-height: 1.45;
+}
+
+
+/* =========================================================
+   REDUCED MOTION + SMALL SCREEN DECORATION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    .role-page * {
+        transition: none !important;
+    }
+}
+
+@media (max-width: 680px) {
+    .role-page::before {
+        width: 150px;
+        height: 135px;
+        top: -50px;
+        right: -45px;
+    }
+
+    .role-page::after {
+        width: 50px;
+        height: 45px;
+        top: 50px;
+        right: 90px;
+    }
+
+    .role-select {
+        padding: 40px 20px;
+    }
+}

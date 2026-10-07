@@ -1,0 +1,480 @@
+/* =====================================================
+   LOGIN PAGE
+   Split card: white brand panel + navy form panel with
+   a curved edge. 3D hexagons use clip-path on the inner
+   shape and drop-shadow on the wrapper (clip-path would
+   cut a normal box-shadow).
+   ===================================================== */
+
+.login-page {
+    --lg-navy: #151b52;
+    --lg-navy-deep: #0f1538;
+    --lg-navy-mid: #1d2766;
+    --lg-ink: #1a2140;
+    --lg-muted: #6f7a95;
+    --lg-blue: #1a6ce0;
+    --lg-blue-soft: #e6eefc;
+    --lg-yellow: #fbc94a;
+    --lg-yellow-dark: #efb72a;
+    --lg-red: #ff6b70;
+    --lg-hex: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%);
+
+    position: relative;
+    overflow: hidden;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    box-sizing: border-box;
+    background: radial-gradient(circle at 20% 15%, #232d7a 0%, var(--lg-navy-deep) 60%);
+    font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+.login-page * {
+    box-sizing: border-box;
+}
+
+.lg-unknown {
+    padding: 24px;
+    font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+
+/* =====================================================
+   3D HEXAGON
+   ===================================================== */
+
+.lg-hex-wrap {
+    position: absolute;
+    display: block;
+    pointer-events: none;
+    filter: drop-shadow(0 14px 14px rgba(8, 12, 40, 0.35));
+}
+
+.lg-hex {
+    position: absolute;
+    inset: 0;
+    display: block;
+    clip-path: var(--lg-hex);
+    background: linear-gradient(135deg, var(--hx-a, #3a8bff) 0%, var(--hx-b, #1a4fb0) 100%);
+}
+
+/* bevel highlight (top-left) */
+.lg-hex::before {
+    content: "";
+    position: absolute;
+    inset: 8% 10% 18% 10%;
+    clip-path: var(--lg-hex);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 60%);
+}
+
+/* shaded lower edge for depth */
+.lg-hex::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.3) 100%);
+}
+
+/* background hexagons */
+.lg-hex-wrap--bg1 {
+    --hx-a: #3a8bff;
+    --hx-b: #1a4fb0;
+    left: 4%;
+    top: 8%;
+    width: 150px;
+    height: 135px;
+    opacity: 0.35;
+    animation: lg-float 10s ease-in-out infinite;
+}
+
+.lg-hex-wrap--bg2 {
+    --hx-a: #ffdf7a;
+    --hx-b: #efb72a;
+    right: 5%;
+    bottom: 7%;
+    width: 120px;
+    height: 108px;
+    opacity: 0.4;
+    animation: lg-float 12s ease-in-out infinite reverse;
+}
+
+@keyframes lg-float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50%      { transform: translateY(-12px) rotate(4deg); }
+}
+
+/* bokeh bubbles */
+.lg-bubble {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.02));
+    pointer-events: none;
+}
+
+.lg-bubble--1 { width: 120px; height: 120px; left: 12%; bottom: 10%; }
+.lg-bubble--2 { width: 70px;  height: 70px;  right: 22%; top: 8%; }
+.lg-bubble--3 { width: 190px; height: 190px; right: -50px; top: 38%; }
+
+
+/* =====================================================
+   CARD
+   ===================================================== */
+
+.lg-card {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    width: 100%;
+    max-width: 980px;
+    min-height: 580px;
+    overflow: hidden;
+    border-radius: 36px;
+    background: #ffffff;
+    box-shadow: 0 30px 70px rgba(5, 8, 30, 0.5);
+}
+
+
+/* =====================================================
+   LEFT: BRAND PANEL
+   ===================================================== */
+
+.lg-brand-panel {
+    position: relative;
+    flex: 1 1 52%;
+    display: flex;
+    flex-direction: column;
+    padding: 34px 40px 28px;
+    background: linear-gradient(160deg, #ffffff 0%, #eef3fd 100%);
+}
+
+.lg-logo {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 40px;
+}
+
+.lg-hex-wrap--logo {
+    --hx-a: var(--lg-yellow);
+    --hx-b: var(--lg-yellow-dark);
+    position: relative;
+    width: 38px;
+    height: 34px;
+    filter: drop-shadow(0 4px 4px rgba(21, 27, 82, 0.25));
+}
+
+.lg-logo-text {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--lg-navy);
+    letter-spacing: -0.2px;
+}
+
+/* artwork area */
+.lg-art {
+    position: relative;
+    flex: 1;
+    min-height: 240px;
+    margin: 8px 0;
+}
+
+/* soft organic shape behind the hexagons */
+.lg-blob {
+    position: absolute;
+    inset: 6% 4% 4% 2%;
+    border-radius: 58% 42% 55% 45% / 48% 56% 44% 52%;
+    background: linear-gradient(145deg, #dbe7fb 0%, #c4d7f5 100%);
+    box-shadow: inset 0 0 40px rgba(255, 255, 255, 0.7);
+}
+
+.lg-hex-wrap--main {
+    --hx-a: #3a8bff;
+    --hx-b: var(--lg-navy);
+    left: 28%;
+    top: 14%;
+    width: 210px;
+    height: 190px;
+}
+
+.lg-hex-wrap--yellow {
+    --hx-a: #ffdf7a;
+    --hx-b: var(--lg-yellow-dark);
+    left: 8%;
+    top: 58%;
+    width: 100px;
+    height: 90px;
+}
+
+.lg-hex-wrap--small {
+    --hx-a: #5aa0ff;
+    --hx-b: #1a4fb0;
+    right: 10%;
+    top: 62%;
+    width: 70px;
+    height: 63px;
+}
+
+.lg-brand-copy h2 {
+    margin: 0 0 6px;
+    font-size: 21px;
+    line-height: 1.25;
+    font-weight: 700;
+    color: var(--lg-navy);
+}
+
+.lg-brand-copy p {
+    margin: 0;
+    max-width: 340px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--lg-muted);
+}
+
+.lg-copyright {
+    margin: 22px 0 0;
+    font-size: 11.5px;
+    color: var(--lg-muted);
+}
+
+
+/* =====================================================
+   RIGHT: FORM PANEL (curved edge)
+   ===================================================== */
+
+.lg-form-panel {
+    position: relative;
+    flex: 1 1 48%;
+    display: flex;
+    align-items: center;
+    margin-left: -70px;
+    padding: 40px 48px 40px 110px;
+    color: #ffffff;
+    background: linear-gradient(160deg, var(--lg-navy-mid) 0%, var(--lg-navy) 55%, var(--lg-navy-deep) 100%);
+    border-radius: 280px 0 0 220px / 55% 0 0 45%;
+}
+
+.lg-form {
+    width: 100%;
+    max-width: 320px;
+}
+
+.lg-title {
+    margin: 0 0 6px;
+    font-size: 32px;
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+}
+
+.lg-subtitle {
+    margin: 0 0 22px;
+    font-size: 13.5px;
+    color: #b9c4f5;
+}
+
+.lg-note {
+    margin: 0 0 18px;
+    padding: 11px 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.08);
+    font-size: 12px;
+    line-height: 1.5;
+    color: #d5dcfa;
+}
+
+.lg-note a {
+    color: var(--lg-yellow);
+    font-weight: 700;
+}
+
+.lg-label {
+    display: block;
+    margin: 14px 0 6px 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #d5dcfa;
+}
+
+.lg-input-wrap {
+    position: relative;
+}
+
+.lg-input {
+    width: 100%;
+    height: 46px;
+    padding: 0 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    background: rgba(8, 12, 40, 0.45);
+    color: #ffffff;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.lg-input-wrap .lg-input {
+    padding-right: 46px;
+}
+
+.lg-input::placeholder {
+    color: #8e9ad0;
+}
+
+.lg-input:focus {
+    background: rgba(8, 12, 40, 0.65);
+    border-color: var(--lg-yellow);
+    box-shadow: 0 0 0 4px rgba(251, 201, 74, 0.18);
+}
+
+.lg-eye {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #b9c4f5;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.lg-eye:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+
+/* =====================================================
+   BUTTON + LINKS
+   ===================================================== */
+
+.lg-submit {
+    width: 100%;
+    height: 48px;
+    margin-top: 24px;
+    border: none;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #ffd868 0%, var(--lg-yellow-dark) 100%);
+    color: var(--lg-navy-deep);
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(239, 183, 42, 0.3);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.lg-submit:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 22px rgba(239, 183, 42, 0.4);
+}
+
+.lg-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.lg-error {
+    margin: 14px 0 0;
+    padding: 11px 14px;
+    border-radius: 14px;
+    border-left: 4px solid var(--lg-red);
+    background: rgba(255, 107, 112, 0.14);
+    color: #ffc9cb;
+    font-size: 13px;
+}
+
+.lg-footer-text,
+.lg-back {
+    margin: 18px 0 0;
+    text-align: center;
+    font-size: 13px;
+    color: #b9c4f5;
+}
+
+.lg-back {
+    margin-top: 10px;
+}
+
+.lg-footer-text a {
+    color: var(--lg-yellow);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.lg-back a {
+    color: #b9c4f5;
+    text-decoration: none;
+}
+
+.lg-footer-text a:hover,
+.lg-back a:hover {
+    text-decoration: underline;
+    color: #ffffff;
+}
+
+
+/* =====================================================
+   FOCUS + REDUCED MOTION
+   ===================================================== */
+
+.login-page a:focus-visible,
+.login-page button:focus-visible {
+    outline: 3px solid var(--lg-yellow);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .login-page * {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 860px) {
+    .lg-card {
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    .lg-brand-panel {
+        padding: 24px 28px 8px;
+    }
+
+    .lg-art,
+    .lg-brand-copy,
+    .lg-copyright {
+        display: none;
+    }
+
+    .lg-form-panel {
+        margin: 0;
+        padding: 36px 28px 40px;
+        border-radius: 36px 36px 0 0;
+    }
+
+    .lg-form {
+        margin: 0 auto;
+    }
+
+    .lg-hex-wrap--bg1,
+    .lg-bubble--3 {
+        display: none;
+    }
+}
