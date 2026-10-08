@@ -12,7 +12,6 @@ const API_URL = "http://localhost:5000";
 const TEACHER_LOGIN_ROLES = {
   teacher: "teacher",
   "class-teacher": "teacher", // a class teacher is also a teacher in the database
-  bursar: "bursar",
 };
 
 // One 3D hexagon: the wrapper carries the drop-shadow,
@@ -55,6 +54,7 @@ export default function Login() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             role: portal,
+            portal: role,
             email: email.trim(),
             password,
           }),
