@@ -712,6 +712,7 @@
     .sctt-row { grid-template-columns: 112px repeat(var(--cols), minmax(0, 1fr)); }
     .sctt-inner { min-width: calc(112px + var(--cols) * 150px); }
     .sctt-inner.single { min-width: 0; }
+   
     .sctt-tools { width: 100%; }
     .sctt-tool { flex: 1; justify-content: center; }
     .sctt-savebar { flex-wrap: wrap; justify-content: center; bottom: 12px; }

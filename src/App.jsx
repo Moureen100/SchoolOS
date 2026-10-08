@@ -18,6 +18,10 @@ import StudentForm from "./pages/admin/StudentForm";
 import StudentList from "./pages/admin/StudentList.jsx";
 import AddTeacher from "./pages/admin/Addteacher";
 import Feesetpage from "./pages/admin/Feesetpage";
+import AcademicOversight from "./pages/admin/AcademicOversight";
+import SystemConfiguration from "./pages/admin/SystemConfiguration";
+import Communication from "./pages/admin/Communication";
+
 
 // =====================================================
 // TEACHER
@@ -55,6 +59,9 @@ import CaptureMoney from "./pages/bursar/CaptureMoney";
 import PupilDetails from "./pages/bursar/PupilDetails";
 import Records from "./pages/bursar/Records";
 import UpdateStatus from "./pages/bursar/UpdateStatus";
+
+
+
 
 
 export default function App() {
@@ -135,6 +142,21 @@ export default function App() {
                     path="/admin/feeset"
                     element={<Feesetpage />}
                 />
+
+                
+                <Route 
+                    path="/admin/academics" 
+                    element={<AcademicOversight />} 
+                />
+                <Route 
+                    path="/admin/configuration" 
+                    element={<SystemConfiguration />} 
+                />
+                <Route 
+                    path="/admin/communication" 
+                     element={<Communication />} 
+                />
+
 
 
                 {/* =====================================================

@@ -10,6 +10,9 @@ import {
     FaChalkboardTeacher,
     FaMoneyBillWave,
     FaClipboardCheck,
+    FaGraduationCap,
+    FaCog,
+    FaBullhorn,
 } from "react-icons/fa";
 
 import "./Layout.css";
@@ -113,6 +116,29 @@ const ROLE_LINKS = {
                 label: "Fee Set",
                 icon: <FaMoneyBillWave />,
             },
+
+            
+            {
+                to: "/admin/academics",
+                label: "Academic Oversight",
+                icon: <FaGraduationCap />,
+            },
+
+            
+            
+           {
+                to: "/admin/communication",
+                label: "Communication",
+                icon: <FaBullhorn />,
+            },
+
+            {
+                to: "/admin/configuration",
+                label: "System Configuration",
+                icon: <FaCog />,
+            },
+
+
         ],
     },
 
