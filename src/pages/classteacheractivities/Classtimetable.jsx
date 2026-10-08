@@ -621,8 +621,27 @@ export default function Classtimetable() {
        to that class.
        ===================================================== */
 
-    const teachersFor = () => {
-        return teachers;
+    const teachersFor = (subject) => {
+        const selectedSubject = String(subject || "")
+            .trim()
+            .toLowerCase();
+
+        if (!selectedSubject) {
+            return [];
+        }
+
+        return teachers.filter((teacher) => {
+            if (!Array.isArray(teacher.subjects)) {
+                return false;
+            }
+
+            return teacher.subjects.some(
+                (teacherSubject) =>
+                    String(teacherSubject || "")
+                        .trim()
+                        .toLowerCase() === selectedSubject
+            );
+        });
     };
 
 
@@ -2008,28 +2027,18 @@ export default function Classtimetable() {
                                     lessonModal.subject
                                 ).map(
                                     (t) => (
-
                                         <option
-                                            key={
-                                                t.id
-                                            }
-                                            value={
-                                                t.id
-                                            }
+                                            key={t.id}
+                                            value={t.id}
                                         >
-
-                                            {
-                                                t.firstName ||
+                                            {t.firstName ||
                                                 t.name ||
-                                                "Unnamed teacher"
-                                            }
+                                                "Unnamed teacher"}
 
                                             {t.employeeId
                                                 ? ` — ${t.employeeId}`
                                                 : ""}
-
                                         </option>
-
                                     )
                                 )}
 
