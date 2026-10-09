@@ -10,6 +10,10 @@ import {
     FaChalkboardTeacher,
     FaMoneyBillWave,
     FaClipboardCheck,
+    FaReceipt,
+    FaExclamationTriangle,
+    FaWallet,
+    FaUserCircle,
     FaGraduationCap,
     FaCog,
     FaBullhorn,
@@ -250,6 +254,11 @@ const ROLE_LINKS = {
                 label: "Update Status",
                 icon: <FaCalendarAlt />,
             },
+
+            { to: "/bursar/receipts", label: "Receipts", icon: <FaReceipt /> },
+            { to: "/bursar/defaulters", label: "Defaulters", icon: <FaExclamationTriangle /> },
+            { to: "/bursar/expenses", label: "Expenses", icon: <FaWallet /> },
+            { to: "/bursar/student-profile", label: "Student Profile", icon: <FaUserCircle /> },
         ],
     },
 };

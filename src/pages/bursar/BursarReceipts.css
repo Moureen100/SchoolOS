@@ -1,0 +1,82 @@
+/* =====================================================
+   BURSARRECEIPTS PAGE - same tokens + hexagon clip-path language
+   as Addteacher.css. 3D: each card sits in a wrapper with a
+   stacked drop-shadow (filter on the wrapper, since clip-path
+   would cut a normal box-shadow) and has a cut, folded corner.
+   ===================================================== */
+.bursar-receipts-content {
+    --navy: #151b52; --navy-deep: #0f1538; --ink: #1a2140; --muted: #6f7a95;
+    --blue: #1a6ce0; --blue-soft: #e6eefc; --green: #2aa52e; --green-soft: #e3f5e4;
+    --yellow: #fbc94a; --yellow-dark: #efb72a; --red: #e0282e; --red-soft: #fde8e9;
+    --line: #e4e8f4; --field: #f5f7fd; --radius: 18px; --shadow: 0 6px 18px rgba(21, 27, 82, .08);
+    --hex: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%); --cut: 26px;
+    background: linear-gradient(180deg, #f1f0ff 0%, #d3e2ec 100%); color: var(--ink);
+    font-family: "Inter", "Segoe UI", system-ui, sans-serif; padding: 28px 20px 64px; min-height: 100%;
+}
+.bursar-receipts-content * { box-sizing: border-box; }
+
+.bs-header { position: relative; overflow: hidden; background: var(--navy); color: #fff; border-radius: var(--radius);
+    padding: 24px 30px 22px; margin-bottom: 24px; box-shadow: var(--shadow); }
+.bs-header::after { content: ""; position: absolute; right: -30px; top: -40px; width: 220px; height: 200px;
+    background: linear-gradient(135deg, #2b7cf0, #1a4fb0); opacity: .45; clip-path: var(--hex); pointer-events: none; }
+.bs-header::before { content: ""; position: absolute; right: 150px; bottom: -38px; width: 110px; height: 100px;
+    background: var(--yellow); opacity: .9; clip-path: var(--hex); pointer-events: none; }
+.bs-title { position: relative; z-index: 1; font-size: 26px; font-weight: 700; margin: 0 0 6px; color: #fff; }
+.bs-sub { position: relative; z-index: 1; font-size: 14px; font-weight: 500; margin: 0; color: #b9c4f5; }
+
+.bs-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 26px; margin-bottom: 26px; }
+.bs-wide { grid-column: 1 / -1; }
+.bs-wrap { filter: drop-shadow(0 7px 0 rgba(21, 27, 82, .14)) drop-shadow(0 14px 16px rgba(21, 27, 82, .10)); min-width: 0; }
+.bs-card { --accent: var(--blue); position: relative; height: 100%; padding: 26px 24px 22px; display: flex; flex-direction: column; gap: 14px;
+    background: linear-gradient(var(--accent), var(--accent)) top / 100% 6px no-repeat, #fff;
+    clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, 0 100%); border-radius: 6px 0 var(--radius) var(--radius); }
+.bs-card::after { content: ""; position: absolute; top: 0; right: 0; width: var(--cut); height: var(--cut);
+    background: linear-gradient(225deg, transparent 50%, var(--accent) 50%); opacity: .85; }
+.bs-card-title { font-size: 16px; font-weight: 700; margin: 0; padding-right: 26px; }
+.bs-hint { font-size: 12px; color: var(--muted); margin: -8px 0 0; }
+
+.bs-stat-label { font-size: 12px; font-weight: 600; color: var(--muted); }
+.bs-stat-value { font-size: 26px; font-weight: 800; color: var(--navy); }
+.bs-stat-note { font-size: 12px; color: var(--muted); }
+
+.bs-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.bs-label { font-size: 12px; font-weight: 600; color: var(--muted); }
+.bs-flex { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.bursar-receipts-content input, .bursar-receipts-content select, .bursar-receipts-content textarea { width: 100%; height: 42px; border: 1px solid transparent; border-radius: 12px;
+    padding: 0 14px; font-size: 14px; font-family: inherit; color: var(--ink); background: var(--field); outline: none;
+    transition: border-color .15s, box-shadow .15s, background .15s; }
+.bursar-receipts-content input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--navy); }
+.bursar-receipts-content textarea { height: 90px; padding: 12px 14px; resize: vertical; }
+.bursar-receipts-content input:focus, .bursar-receipts-content select:focus, .bursar-receipts-content textarea:focus { background: #fff; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(26, 108, 224, .14); }
+
+.bs-btn { height: 42px; padding: 0 18px; border-radius: 12px; border: none; background: var(--navy-deep); color: #fff; font-size: 13px; font-weight: 600;
+    font-family: inherit; cursor: pointer; white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: background .15s; }
+.bs-btn:hover:not(:disabled) { background: var(--blue); } .bs-btn:disabled { opacity: .4; cursor: not-allowed; }
+.bs-btn--sm { height: 34px; padding: 0 14px; }
+.bs-btn--danger { background: var(--red-soft); color: var(--red); } .bs-btn--danger:hover:not(:disabled) { background: var(--red); color: #fff; }
+.bs-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 24px; border-radius: 12px; border: none;
+    background: var(--yellow); color: var(--navy-deep); font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; text-decoration: none; transition: background .15s, transform .15s; }
+.bs-primary:hover:not(:disabled) { background: var(--yellow-dark); transform: translateY(-1px); } .bs-primary:disabled { opacity: .5; cursor: not-allowed; }
+
+.bs-badge { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 5px 12px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.bs-badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.bs-badge.is-ok { background: var(--green-soft); color: #1d7d21; } .bs-badge.is-bad { background: var(--red-soft); color: var(--red); }
+.bs-badge.is-warn { background: #fff4d6; color: #9a6b00; } .bs-badge.is-off { background: #eceef5; color: var(--muted); }
+
+.bs-scroll { overflow-x: auto; }
+.bs-table { width: 100%; min-width: 620px; border-collapse: separate; border-spacing: 0; }
+.bs-table th { text-align: left; font-size: 12px; font-weight: 700; color: var(--muted); background: var(--field); padding: 10px 12px; white-space: nowrap; }
+.bs-table th:first-child { border-radius: 12px 0 0 12px; } .bs-table th:last-child { border-radius: 0 12px 12px 0; }
+.bs-table td { padding: 12px; border-bottom: 1px solid var(--line); font-size: 14px; vertical-align: middle; }
+.bs-table tr:last-child td { border-bottom: none; }
+.bs-table .is-cancelled td { color: #9aa4c0; text-decoration: line-through; }
+.bs-num { text-align: right; font-variant-numeric: tabular-nums; }
+.bs-empty { text-align: center; color: var(--muted); padding: 26px 0; font-size: 14px; }
+.bs-message { margin-bottom: 22px; padding: 14px 18px; border-radius: 14px; font-size: 14px; font-weight: 500; border-left: 6px solid var(--green);
+    background: var(--green-soft); color: #145c17; box-shadow: var(--shadow); }
+.bs-message--error { border-left-color: var(--red); background: var(--red-soft); color: #8f1a1e; }
+.bursar-receipts-content button:focus-visible, .bursar-receipts-content a:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .bursar-receipts-content * { transition: none !important; } }
+@media (max-width: 1000px) { .bs-grid--4 { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 760px) { .bs-grid, .bs-grid--4, .bs-row { grid-template-columns: 1fr; } .bursar-receipts-content { padding: 20px 14px 48px; } }
+@media print { .bs-no-print, .sidebar, .top-navbar { display: none !important; } .bursar-receipts-content { background: #fff; } .bs-wrap { filter: none; } }

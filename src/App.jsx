@@ -59,6 +59,10 @@ import CaptureMoney from "./pages/bursar/CaptureMoney";
 import PupilDetails from "./pages/bursar/PupilDetails";
 import Records from "./pages/bursar/Records";
 import UpdateStatus from "./pages/bursar/UpdateStatus";
+import BursarReceipts from "./pages/bursar/BursarReceipts";
+import Defaulters from "./pages/bursar/Defaulters";
+import Expenses from "./pages/bursar/Expenses";
+import StudentProfile from "./pages/bursar/StudentProfile";
 
 
 
@@ -280,6 +284,11 @@ export default function App() {
                     path="/bursar/update-status"
                     element={<UpdateStatus />}
                 />
+
+                <Route path="/bursar/receipts" element={<BursarReceipts />} />
+                <Route path="/bursar/defaulters" element={<Defaulters />} />
+                <Route path="/bursar/expenses" element={<Expenses />} />
+                <Route path="/bursar/student-profile" element={<StudentProfile />} />
 
             </Routes>
         </BrowserRouter>
