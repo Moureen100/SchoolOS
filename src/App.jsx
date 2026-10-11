@@ -163,6 +163,21 @@ export default function App() {
 
 
 
+                <Route
+                    path="/admin/academics"
+                    element={<AcademicOversight />}
+                />
+                <Route
+                    path="/admin/configuration"
+                    element={<SystemConfiguration />}
+                />
+                <Route
+                    path="/admin/communication"
+                    element={<Communication />}
+                />
+
+
+
                 {/* =====================================================
                     TEACHER
                 ===================================================== */}
@@ -294,4 +309,3 @@ export default function App() {
         </BrowserRouter>
     );
 }
-
