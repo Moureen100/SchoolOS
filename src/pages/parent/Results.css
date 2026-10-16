@@ -1,0 +1,206 @@
+/* Theme colours arrive as CSS variables from Results.jsx:
+   --c-primary, --c-text-secondary, --c-surface, --c-border, --c-background */
+
+.results-page { max-width: 900px; font-family: sans-serif; }
+.rp-title { color: var(--c-primary); margin: 0 0 4px; }
+.rp-subtitle { color: var(--c-text-secondary); margin: 0 0 20px; }
+
+/* ---------- Filters ---------- */
+.rp-filters { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
+.rp-field { font-size: 13px; color: var(--c-text-secondary); }
+.rp-field span { display: block; margin-bottom: 4px; }
+.rp-field select {
+    padding: 8px 10px; border: 1px solid var(--c-border); border-radius: 6px;
+    font-size: 14px; height: 36px; background: var(--c-surface); min-width: 140px;
+}
+
+/* ---------- Tabs and buttons ---------- */
+.rp-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
+.rp-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--c-border); }
+.rp-tab {
+    background: none; border: none; border-bottom: 3px solid transparent;
+    padding: 10px 14px; font-size: 14px; color: var(--c-text-secondary); cursor: pointer;
+}
+.rp-tab.is-active { color: var(--c-primary); border-bottom-color: var(--c-primary); font-weight: 600; }
+.rp-tab:focus-visible, .rp-btn:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 2px; }
+.rp-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.rp-btn {
+    background: var(--c-primary); color: #fff; border: 1px solid var(--c-primary);
+    border-radius: 6px; padding: 9px 14px; font-size: 13px; cursor: pointer;
+}
+.rp-btn-outline { background: transparent; color: var(--c-primary); }
+.rp-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ---------- Generic panels, diary ---------- */
+.rp-panel { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: 10px; overflow: hidden; margin-bottom: 16px; }
+.rp-pad { padding: 18px; }
+.rp-empty { padding: 40px 16px; text-align: center; color: var(--c-text-secondary); }
+.rp-diary-item { padding: 14px 16px; border-top: 1px solid var(--c-border); }
+.rp-diary-item:first-child { border-top: none; }
+.rp-diary-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.rp-diary-date { font-size: 12px; color: var(--c-text-secondary); }
+.rp-diary-note { margin: 0 0 6px; font-size: 14px; line-height: 1.5; }
+.rp-diary-author { font-size: 12px; color: var(--c-text-secondary); }
+.rp-tag { font-size: 12px; padding: 2px 8px; border-radius: 10px; background: var(--c-background); }
+.rp-tag-achievement { background: #dcfce7; color: #166534; }
+.rp-tag-behaviour { background: #dbeafe; color: #1e40af; }
+.rp-tag-note { background: #fef9c3; color: #854d0e; }
+
+/* ---------- Progress bars ---------- */
+.pb-row { display: grid; grid-template-columns: 110px 1fr 100px; align-items: center; gap: 12px; margin-bottom: 10px; font-size: 13px; }
+.pb-track { height: 14px; background: var(--c-background); border: 1px solid var(--c-border); border-radius: 7px; overflow: hidden; }
+.pb-fill { height: 100%; background: var(--c-primary); border-radius: 7px; }
+.pb-value { text-align: right; font-weight: 600; }
+
+/* ================================================================== */
+/*  REPORT CARD (screen preview + print)                               */
+/* ================================================================== */
+.rc-preview { overflow-x: auto; padding: 4px 0 20px; }
+
+.rc-page {
+    width: 210mm;
+    min-height: 297mm;
+    box-sizing: border-box;
+    margin: 0 auto;
+    padding: 9mm;
+    background: #fff;
+    color: #1f2937;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 12px;
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.18);
+}
+
+/* Double-line certificate style border */
+.rc-frame {
+    position: relative;
+    box-sizing: border-box;
+    min-height: calc(297mm - 18mm);
+    padding: 8mm 8mm 6mm;
+    border: 2px solid var(--c-primary);
+    outline: 1px solid var(--c-primary);
+    outline-offset: -6px;
+    overflow: hidden;
+}
+
+.rc-watermark {
+    position: absolute; left: 50%; top: 52%;
+    transform: translate(-50%, -50%);
+    font-size: 380px; font-weight: 700; line-height: 1;
+    color: var(--c-primary); opacity: 0.045;
+    pointer-events: none; user-select: none;
+}
+.rc-frame > *:not(.rc-watermark) { position: relative; }
+
+/* Header */
+.rc-head { display: flex; align-items: center; gap: 14px; padding-bottom: 10px; border-bottom: 3px double var(--c-primary); }
+.rc-crest {
+    width: 66px; height: 66px; border-radius: 50%; flex: none;
+    background: var(--c-primary); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; font-weight: 700; border: 3px solid #fff; box-shadow: 0 0 0 2px var(--c-primary);
+}
+.rc-school { flex: 1; text-align: center; }
+.rc-school h1 { margin: 0; font-size: 24px; letter-spacing: 0.5px; color: var(--c-primary); }
+.rc-motto { margin: 2px 0; font-style: italic; font-size: 13px; }
+.rc-contact { margin: 0; font-size: 10.5px; color: var(--c-text-secondary); }
+.rc-photo {
+    width: 70px; height: 84px; flex: none; border: 1px solid var(--c-primary);
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    font-size: 9px; color: var(--c-text-secondary); background: #fafafa; overflow: hidden;
+}
+.rc-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+.rc-banner {
+    margin: 10px 0; padding: 6px 10px; text-align: center;
+    background: var(--c-primary); color: #fff;
+    font-size: 14px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+}
+
+/* Pupil details with fill-in-the-blank lines */
+.rc-bio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 14px; margin-bottom: 12px; }
+.rc-field { display: flex; align-items: baseline; gap: 6px; border-bottom: 1px dotted #6b7280; padding-bottom: 2px; min-width: 0; }
+.rc-field-wide { grid-column: span 3; }
+.rc-field-label { font-size: 10.5px; color: var(--c-text-secondary); white-space: nowrap; }
+.rc-field-value { font-weight: 700; font-size: 12.5px; }
+
+/* Marks table */
+.rc-marks { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+.rc-marks th, .rc-marks td { border: 1px solid #9ca3af; padding: 6px 8px; text-align: center; }
+.rc-marks th { background: var(--c-primary); color: #fff; font-size: 11px; line-height: 1.2; border-color: var(--c-primary); }
+.rc-marks th small { display: block; font-weight: 400; font-size: 9.5px; opacity: 0.9; }
+.rc-marks tbody tr:nth-child(even) { background: rgba(0, 0, 0, 0.03); }
+.rc-marks .rc-left { text-align: left; }
+.rc-subject { font-weight: 700; }
+.rc-total { font-weight: 700; }
+.rc-remark { font-style: italic; }
+.rc-initials { font-family: "Brush Script MT", "Segoe Script", cursive; font-size: 14px; }
+.rc-marks tfoot td { background: var(--c-background); font-weight: 700; border-top: 2px solid var(--c-primary); }
+
+.rc-grade { display: inline-block; min-width: 24px; padding: 1px 6px; border-radius: 3px; font-weight: 700; }
+.rc-grade-A { background: #dcfce7; color: #166534; }
+.rc-grade-B { background: #dbeafe; color: #1e40af; }
+.rc-grade-C { background: #fef9c3; color: #854d0e; }
+.rc-grade-D { background: #ffedd5; color: #9a3412; }
+.rc-grade-E { background: #fee2e2; color: #991b1b; }
+
+/* Key + conduct boxes */
+.rc-row { display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; margin-bottom: 12px; }
+.rc-box { border: 1px solid #9ca3af; padding: 8px 10px; }
+.rc-box h3, .rc-comment h3 { margin: 0 0 4px; font-size: 11.5px; color: var(--c-primary); text-transform: uppercase; letter-spacing: 0.6px; }
+.rc-key-line { display: grid; grid-template-columns: 22px 70px 1fr; font-size: 11px; padding: 1px 0; }
+.rc-key-line em { color: var(--c-text-secondary); }
+.rc-conduct { margin: 0 0 6px; font-weight: 700; font-size: 12.5px; }
+
+/* Comments with signature lines and stamp */
+.rc-comment { position: relative; border: 1px solid #9ca3af; padding: 8px 10px 10px; margin-bottom: 10px; min-height: 62px; }
+.rc-comment p { margin: 2px 0 14px; font-style: italic; line-height: 1.5; font-size: 12.5px; padding-right: 90px; }
+.rc-sign { width: 200px; font-size: 10px; color: var(--c-text-secondary); }
+.rc-sign span { display: block; border-bottom: 1px solid #111; height: 16px; margin-bottom: 2px; }
+.rc-stamp {
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%) rotate(-12deg);
+    width: 72px; height: 72px; border: 2px dashed var(--c-primary); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    font-size: 9px; color: var(--c-primary); opacity: 0.7;
+}
+.rc-diary-list { margin: 4px 0 0; padding-left: 18px; line-height: 1.5; font-size: 12px; }
+
+.rc-foot { margin-top: 8px; padding-top: 6px; border-top: 1px solid #9ca3af; text-align: center; font-size: 10px; color: var(--c-text-secondary); }
+
+/* Print-only sheet is never visible on screen */
+.report-sheet { display: none; }
+
+@media (max-width: 600px) {
+    .rp-actions { width: 100%; }
+    .rp-btn { flex: 1; }
+    .pb-row { grid-template-columns: 90px 1fr 80px; }
+}
+
+/* ================================================================== */
+/*  PRINT / SAVE AS PDF                                                */
+/* ================================================================== */
+@page { size: A4; margin: 0; }
+
+@media print {
+    /* hide the whole app, show only the report sheet added to <body> */
+    body > *:not(.report-sheet) { display: none !important; }
+    .report-sheet { display: block; }
+
+    body { background: #fff !important; margin: 0; }
+    .report-sheet, .report-sheet * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .report-sheet .rc-page {
+        box-shadow: none;
+        margin: 0;
+        width: 210mm;
+        height: 297mm;
+        min-height: 0;
+        overflow: hidden;
+        break-after: page;
+        page-break-after: always;
+    }
+    .report-sheet .rc-page:last-child { break-after: auto; page-break-after: auto; }
+    .report-sheet .rc-frame { min-height: 0; height: calc(297mm - 18mm); }
+}
