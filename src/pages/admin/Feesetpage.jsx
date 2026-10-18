@@ -12,7 +12,7 @@ import {
     FaPercentage,
 } from "react-icons/fa";
 import Layout from "../../Layout";
-import "./FeeSet.css";
+import "./Feeset.css";
 
 // =====================================================
 // OPTIONS
