@@ -4,7 +4,7 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { AUTH_CONFIG } from "./authConfig";
 import "./Login.css";
 
-const API_URL = "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 // Roles that log in with the email + password made in "Create Teacher".
 // Left side  = the role in the page URL (must match AUTH_CONFIG keys)

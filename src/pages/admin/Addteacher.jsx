@@ -21,7 +21,12 @@ import "./Addteacher.css";
 // =====================================================
 // BACKEND URL
 // =====================================================
-const API_URL = "http://localhost:5000";
+
+/* BACKEND URL */
+const API_BASE = (
+    import.meta.env.VITE_API_URL || ""
+).replace(/\/+$/, "");
+
 
 // =====================================================
 // STATIC OPTIONS
@@ -143,7 +148,7 @@ const AddTeacherPage = () => {
         try {
             setLoadingTeachers(true);
 
-            const response = await fetch(`${API_URL}/teachers`);
+            const response = await fetch(`${API_BASE}/teachers`);
             const data = await response.json();
 
             if (!response.ok) {
@@ -192,7 +197,7 @@ const AddTeacherPage = () => {
     const loadCredentials = async () => {
         try {
             const response = await fetch(
-                `${API_URL}/teachers/next-credentials`
+                `${API_BASE}/teachers/next-credentials`
             );
             const data = await response.json();
 
@@ -439,8 +444,8 @@ const AddTeacherPage = () => {
 
             const response = await fetch(
                 isEditing
-                    ? `${API_URL}/teachers/${editingId}`
-                    : `${API_URL}/teachers`,
+                    ? `${API_BASE}/teachers/${editingId}`
+                    : `${API_BASE}/teachers`,
                 {
                     method: isEditing ? "PUT" : "POST",
                     headers: {
@@ -546,7 +551,7 @@ const AddTeacherPage = () => {
             setMessage(null);
 
             const response = await fetch(
-                `${API_URL}/teachers/${teacher.id}/reset-password`,
+                `${API_BASE}/teachers/${teacher.id}/reset-password`,
                 {
                     method: "POST",
                     // add your auth header here if your other
@@ -621,7 +626,7 @@ const AddTeacherPage = () => {
             setMessage(null);
 
             const response = await fetch(
-                `${API_URL}/teachers/${teacher.id}`,
+                `${API_BASE}/teachers/${teacher.id}`,
                 {
                     method: "DELETE",
                     // add your auth header here if your other
@@ -693,7 +698,7 @@ const AddTeacherPage = () => {
 
         try {
             const response = await fetch(
-                `${API_URL}/teachers/${teacher.id}/status`,
+                `${API_BASE}/teachers/${teacher.id}/status`,
                 {
                     method: "PATCH",
                     headers: {
