@@ -1,14 +1,27 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-// Public / Welcome
+// =====================================================
+// SHARED LAYOUT (adjust the path if Layout.jsx lives elsewhere)
+// =====================================================
+import Layout from "./Layout";
+
+// =====================================================
+// PUBLIC / WELCOME
+// =====================================================
 import Welcome from "./pages/welcome";
 
-// Authentication
+// =====================================================
+// AUTHENTICATION
+// =====================================================
 import RoleSelect from "./pages/RoleSelect";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
 import AccountRecovery from "./pages/auth/AccountRecovery";
 import Profile from "./pages/profile/Profile";
+
+// PASSWORD RECOVERY
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 // =====================================================
 // ADMIN
@@ -22,6 +35,8 @@ import AcademicOversight from "./pages/admin/AcademicOversight";
 import SystemConfiguration from "./pages/admin/SystemConfiguration";
 import Communication from "./pages/admin/Communication";
 
+// NEW: AI Creative Studio (posters, flyers, banners)
+import AICreativeStudio from "./pages/admin/AiCreativestudio";
 
 // =====================================================
 // TEACHER
@@ -37,8 +52,6 @@ import WeeklyReport from "./pages/teacher/WeeklyReport";
 // CLASS TEACHER
 // =====================================================
 import ClassTeacher from "./pages/ClassTeacher";
-
-// Class Teacher Activities
 import Classtimetable from "./pages/classteacheractivities/Classtimetable";
 import ClassTeacherAttendance from "./pages/classteacheractivities/ClassTeacherAttendance";
 
@@ -64,10 +77,9 @@ import Defaulters from "./pages/bursar/Defaulters";
 import Expenses from "./pages/bursar/Expenses";
 import StudentProfile from "./pages/bursar/StudentProfile";
 
-
-
-
-
+// =====================================================
+// MAIN APPLICATION ROUTER
+// =====================================================
 export default function App() {
     return (
         <BrowserRouter>
@@ -80,6 +92,20 @@ export default function App() {
                 <Route
                     path="/"
                     element={<Welcome />}
+                />
+
+                {/* =====================================================
+                    PASSWORD RECOVERY
+                ===================================================== */}
+
+                <Route
+                    path="/forgot-password"
+                    element={<ForgotPassword />}
+                />
+
+                <Route
+                    path="/reset-password"
+                    element={<ResetPassword />}
                 />
 
                 {/* =====================================================
@@ -115,7 +141,6 @@ export default function App() {
                     element={<Profile />}
                 />
 
-
                 {/* =====================================================
                     ADMIN
                 ===================================================== */}
@@ -140,43 +165,30 @@ export default function App() {
                     element={<AddTeacher />}
                 />
 
-                {/* Fee Set */}
-
                 <Route
                     path="/admin/feeset"
                     element={<Feesetpage />}
                 />
 
-                
-                <Route 
-                    path="/admin/academics" 
-                    element={<AcademicOversight />} 
-                />
-                <Route 
-                    path="/admin/configuration" 
-                    element={<SystemConfiguration />} 
-                />
-                <Route 
-                    path="/admin/communication" 
-                     element={<Communication />} 
-                />
-
-
-
                 <Route
                     path="/admin/academics"
                     element={<AcademicOversight />}
                 />
+
                 <Route
                     path="/admin/configuration"
                     element={<SystemConfiguration />}
                 />
+
                 <Route
                     path="/admin/communication"
                     element={<Communication />}
                 />
 
-
+                <Route
+                    path="/admin/ai-studio"
+                    element={<Layout role="admin"><AICreativeStudio /></Layout>}
+                />
 
                 {/* =====================================================
                     TEACHER
@@ -212,7 +224,6 @@ export default function App() {
                     element={<WeeklyReport />}
                 />
 
-
                 {/* =====================================================
                     CLASS TEACHER
                 ===================================================== */}
@@ -222,24 +233,15 @@ export default function App() {
                     element={<ClassTeacher />}
                 />
 
-                {/* =====================================================
-                    CLASS TEACHER — ATTENDANCE
-                ===================================================== */}
-
                 <Route
                     path="/class-teacher/attendance"
                     element={<ClassTeacherAttendance />}
                 />
 
-                {/* =====================================================
-                    CLASS TEACHER — TIMETABLE
-                ===================================================== */}
-
                 <Route
                     path="/class-teacher/timetable"
                     element={<Classtimetable />}
                 />
-
 
                 {/* =====================================================
                     PARENT
@@ -270,7 +272,6 @@ export default function App() {
                     element={<Receipts />}
                 />
 
-
                 {/* =====================================================
                     BURSAR
                 ===================================================== */}
@@ -300,10 +301,25 @@ export default function App() {
                     element={<UpdateStatus />}
                 />
 
-                <Route path="/bursar/receipts" element={<BursarReceipts />} />
-                <Route path="/bursar/defaulters" element={<Defaulters />} />
-                <Route path="/bursar/expenses" element={<Expenses />} />
-                <Route path="/bursar/student-profile" element={<StudentProfile />} />
+                <Route
+                    path="/bursar/receipts"
+                    element={<BursarReceipts />}
+                />
+
+                <Route
+                    path="/bursar/defaulters"
+                    element={<Defaulters />}
+                />
+
+                <Route
+                    path="/bursar/expenses"
+                    element={<Expenses />}
+                />
+
+                <Route
+                    path="/bursar/student-profile"
+                    element={<StudentProfile />}
+                />
 
             </Routes>
         </BrowserRouter>

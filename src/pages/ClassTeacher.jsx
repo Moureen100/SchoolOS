@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";          // NEW
+import { useEffect, useId, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { createPortal } from "react-dom";
 import Layout from "../Layout";
 import "./ClassTeacher.css";
 
@@ -19,12 +20,29 @@ import {
     FiLayers,
     FiCheckSquare,
     FiBarChart2,
+    FiEye,
+    FiX,
+    FiPrinter,
+    FiCamera,
+    FiTrash2,
+    FiEdit3,
+    FiRotateCcw,
 } from "react-icons/fi";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-// NEW: where to send the teacher when his session is not valid
+// where to send the teacher when his session is not valid
 const LOGIN_PATH = "/login/class-teacher";
+
+// school details printed on the report card (change these)
+const SCHOOL = {
+    name: "Your School Name",
+    motto: "Excellence in Learning",
+    address: "P.O. Box 0000, Kampala, Uganda",
+    phone: "+256 700 000 000",
+    email: "info@yourschool.ac.ug",
+    headTeacher: "Head Teacher",
+};
 
 // =========================================================
 // GRADE POINTS
@@ -59,17 +77,55 @@ const ASSESSMENT_ORDER = [
 const PAGE_SIZES = [25, 50, 100];
 
 // =========================================================
-// NEW: FETCH WITH THE LOGIN TOKEN
-// Every class teacher request must carry the token, the
-// server uses it to decide which class he may see.
+// BROWSER SAVE / LOAD
+// Only the passport photo still uses this now.
+// Signature and remarks are saved on the server.
 // =========================================================
 
-async function authFetch(url) {
+function readSaved(key, fallback) {
+
+    try {
+        const raw = localStorage.getItem(key);
+        return raw === null ? fallback : JSON.parse(raw);
+    } catch {
+        return fallback;
+    }
+}
+
+function writeSaved(key, value) {
+
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    } catch (err) {
+        console.error("Could not save changes:", err);
+    }
+}
+
+// =========================================================
+// FETCH WITH THE LOGIN TOKEN (GET or POST)
+// Every class teacher request must carry the token, the
+// server uses it to decide which class he may see.
+//
+// authFetch(url)                      -> GET
+// authFetch(url, { method: "POST", body: {...} })
+// =========================================================
+
+async function authFetch(url, options = {}) {
+
+    const { method = "GET", body } = options;
+
+    const headers = {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+    };
+
+    if (body !== undefined) {
+        headers["Content-Type"] = "application/json";
+    }
 
     const response = await fetch(url, {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+        method,
+        headers,
+        body: body !== undefined ? JSON.stringify(body) : undefined,
     });
 
     const data = await response.json().catch(() => ({}));
@@ -86,7 +142,7 @@ export default function ClassTeacher() {
     const navigate = useNavigate();
 
     // =====================================================
-    // NEW: HIS CLASS(ES), LOADED FROM THE SERVER
+    // HIS CLASS(ES), LOADED FROM THE SERVER
     // =====================================================
 
     const [myClasses, setMyClasses] = useState([]);
@@ -102,6 +158,7 @@ export default function ClassTeacher() {
     const [term, setTerm] = useState("Term 1");
     const [studentClass, setStudentClass] = useState("");   // set after his classes load
     const [stream, setStream] = useState("all");
+    const [assessmentFilter, setAssessmentFilter] = useState("B.O.T");
 
     // =====================================================
     // WHICH ASSESSMENT IS SHOWN (one at a time)
@@ -129,6 +186,36 @@ export default function ClassTeacher() {
     const requestId = useRef(0);
 
     // =====================================================
+    // REPORT CARD POPUP (null = closed)
+    // =====================================================
+
+    const [reportRow, setReportRow] = useState(null);
+
+    // =====================================================
+    // SIGNATURE (class teacher only, sign once per class)
+    // { name: "Mr. Okello", signedOn: "2026-10-18" }
+    // GET  /api/class-teacher/signature?class=P.5
+    // POST /api/class-teacher/signature   { class, name }
+    // =====================================================
+
+    const [teacherSign, setTeacherSign] = useState({ name: "", signedOn: "" });
+    const [signSaving, setSignSaving] = useState(false);
+    const [signError, setSignError] = useState("");
+
+
+    const [submissionError, setSubmissionError] = useState("");
+    const [submissionMessage, setSubmissionMessage] = useState("");
+
+    // =====================================================
+    // REPORT REMARKS FOR THE WHOLE CLASS (conduct + comments)
+    // { [student_id]: { conduct, teacher_comment, ... } }
+    // GET /api/class-teacher/report-remarks?class&term&year&assessment
+    // =====================================================
+
+    const [remarks, setRemarks] = useState({});
+    const [remarksLoaded, setRemarksLoaded] = useState(false);
+
+    // =====================================================
     // SEND TO ADMIN
     // =====================================================
 
@@ -136,7 +223,7 @@ export default function ClassTeacher() {
     const [sent, setSent] = useState(false);
 
     // =====================================================
-    // NEW: SESSION NOT VALID -> BACK TO LOGIN
+    // SESSION NOT VALID -> BACK TO LOGIN
     // =====================================================
 
     function logoutToLogin() {
@@ -145,7 +232,7 @@ export default function ClassTeacher() {
     }
 
     // =====================================================
-    // NEW: LOAD HIS CLASS FROM THE SERVER (once)
+    // LOAD HIS CLASS FROM THE SERVER (once)
     // =====================================================
 
     useEffect(() => {
@@ -197,7 +284,118 @@ export default function ClassTeacher() {
     }, []);
 
     // =====================================================
-    // NEW: CLASS OPTIONS = ONLY HIS CLASSES
+    // LOAD THE SAVED SIGNATURE (follows the selected class)
+    // =====================================================
+
+    useEffect(() => {
+
+        setSignError("");
+
+        if (!studentClass) {
+            setTeacherSign({ name: "", signedOn: "" });
+            return;
+        }
+
+        let cancelled = false;
+
+        async function loadSignature() {
+
+            try {
+
+                const { response, data } = await authFetch(
+                    `${API_URL}/api/class-teacher/signature` +
+                    `?class=${encodeURIComponent(studentClass)}`
+                );
+
+                if (cancelled) {
+                    return;
+                }
+
+                if (response.status === 401) {
+                    logoutToLogin();
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.message || "Could not load your signature"
+                    );
+                }
+
+                setTeacherSign({
+                    name: data.name || "",
+                    signedOn: data.signed_on || "",
+                });
+
+            } catch (err) {
+
+                if (cancelled) {
+                    return;
+                }
+
+                console.error("Error getting signature:", err);
+                setTeacherSign({ name: "", signedOn: "" });
+                setSignError(err.message || "Could not load your signature");
+            }
+        }
+
+        loadSignature();
+
+        return () => {
+            cancelled = true;
+        };
+
+    }, [studentClass]);
+
+    // name = "" removes the signature
+    async function saveTeacherSign(name) {
+
+        if (!studentClass) {
+            return;
+        }
+
+        setSignSaving(true);
+        setSignError("");
+
+        try {
+
+            const { response, data } = await authFetch(
+                `${API_URL}/api/class-teacher/signature`,
+                {
+                    method: "POST",
+                    body: { class: studentClass, name },
+                }
+            );
+
+            if (response.status === 401) {
+                logoutToLogin();
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Could not save your signature"
+                );
+            }
+
+            setTeacherSign({
+                name: data.name || "",
+                signedOn: data.signed_on || "",
+            });
+
+        } catch (err) {
+
+            console.error("Error saving signature:", err);
+            setSignError(err.message || "Could not save your signature");
+
+        } finally {
+
+            setSignSaving(false);
+        }
+    }
+
+    // =====================================================
+    // CLASS OPTIONS = ONLY HIS CLASSES
     // =====================================================
 
     const classOptions = [
@@ -225,12 +423,12 @@ export default function ClassTeacher() {
 
         try {
 
-            // CHANGED: protected class teacher route + token
             const url =
                 `${API_URL}/api/class-teacher/marks` +
                 `?class=${encodeURIComponent(studentClass)}` +
                 `&term=${encodeURIComponent(term)}` +
-                `&year=${encodeURIComponent(year)}`;
+                `&year=${encodeURIComponent(year)}` +
+                `&assessment_type=${encodeURIComponent(assessmentFilter)}`;
 
             const { response, data } = await authFetch(url);
 
@@ -277,7 +475,7 @@ export default function ClassTeacher() {
 
     useEffect(() => {
         getClassMarks();
-    }, [year, term, studentClass]);
+    }, [year, term, studentClass, assessmentFilter]);
 
     // =====================================================
     // BACK TO PAGE 1 WHEN THE VIEW CHANGES
@@ -285,11 +483,13 @@ export default function ClassTeacher() {
 
     useEffect(() => {
         setPage(1);
+        setReportRow(null);          // close the report card
     }, [
         year,
         term,
         studentClass,
         stream,
+        assessmentFilter,
         selectedAssessment,
         search,
         pageSize,
@@ -355,6 +555,80 @@ export default function ClassTeacher() {
         : sortedAssessments[0] || "";
 
     // =====================================================
+    // LOAD THE SAVED REMARKS OF THE CLASS
+    // (conduct + comments for the assessment on screen)
+    // =====================================================
+
+    useEffect(() => {
+
+        setRemarks({});
+        setRemarksLoaded(false);
+
+        if (!studentClass || !activeAssessment) {
+            return;
+        }
+
+        let cancelled = false;
+
+        async function loadRemarks() {
+
+            try {
+
+                const url =
+                    `${API_URL}/api/class-teacher/report-remarks` +
+                    `?class=${encodeURIComponent(studentClass)}` +
+                    `&term=${encodeURIComponent(term)}` +
+                    `&year=${encodeURIComponent(year)}` +
+                    `&assessment=${encodeURIComponent(activeAssessment)}`;
+
+                const { response, data } = await authFetch(url);
+
+                if (cancelled) {
+                    return;
+                }
+
+                if (response.status === 401) {
+                    logoutToLogin();
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.message || "Could not load report remarks"
+                    );
+                }
+
+                const byStudent = {};
+
+                (data.remarks || []).forEach((remark) => {
+                    byStudent[remark.student_id] = remark;
+                });
+
+                setRemarks(byStudent);
+                setRemarksLoaded(true);
+
+            } catch (err) {
+
+                if (cancelled) {
+                    return;
+                }
+
+                // Report cards stay closed, so a failed load can
+                // never be saved over the real remarks.
+                console.error("Error getting report remarks:", err);
+                setError(err.message || "Could not load report remarks");
+            }
+        }
+
+        loadRemarks();
+
+        return () => {
+            cancelled = true;
+        };
+
+    }, [studentClass, term, year, activeAssessment]);
+
+    // =====================================================
     // GET SUBJECTS FOR ASSESSMENT
     // =====================================================
 
@@ -413,23 +687,23 @@ export default function ClassTeacher() {
     }
 
     // =====================================================
-    // CHECK EVERYTHING IS SUBMITTED (all assessments)
+    // SUBMISSION READINESS FOR THE SELECTED ASSESSMENT ONLY
+    // The button must not wait for marks in other assessments.
     // =====================================================
 
-    const allExpectedSubmissions = sortedAssessments.flatMap(
-        (assessment) =>
-            getAssessmentSubjects(assessment).map((subject) => ({
-                subject,
-                assessment,
-            }))
-    );
+    const allExpectedSubmissions = activeAssessment
+        ? getAssessmentSubjects(activeAssessment).map((subject) => ({
+            subject,
+            assessment: activeAssessment,
+        }))
+        : [];
 
     const allSubmitted =
         allExpectedSubmissions.length > 0 &&
-        allExpectedSubmissions.every(
-            ({ subject, assessment }) =>
-                getSubmissionInfo(subject, assessment).submitted
+        allExpectedSubmissions.every(({ subject, assessment }) =>
+            getSubmissionInfo(subject, assessment).submitted
         );
+
 
     // =====================================================
     // STUDENT TOTAL / AVERAGE / AGGREGATE
@@ -606,19 +880,99 @@ export default function ClassTeacher() {
         : [];
 
     // =====================================================
+    // OPEN A REPORT CARD
+    // Only once the saved remarks have loaded, so nothing
+    // saved can be overwritten by the suggestions.
+    // =====================================================
+
+    function openReport(row) {
+
+        if (!remarksLoaded) {
+            return;
+        }
+
+        setReportRow(row);
+    }
+
+    // =====================================================
     // SEND REPORT
     // =====================================================
 
+
     async function handleSendToAdmin() {
+        if (sending) return;
+
+        setSubmissionError("");
+        setSubmissionMessage("");
+
+        if (!API_URL) {
+            setSubmissionError(
+                "Backend URL is missing. Check your VITE_API_URL configuration."
+            );
+            return;
+        }
+
+        if (!studentClass || !activeAssessment || !students.length) {
+            setSubmissionError(
+                "Please select a class and assessment with students loaded."
+            );
+            return;
+        }
+
+        if (!allSubmitted) {
+            setSubmissionError(
+                `Complete all required student marks for ${activeAssessment} before submitting.`
+            );
+            return;
+        }
 
         setSending(true);
 
-        // Temporary until admin endpoint is connected.
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        try {
+            const { response, data } = await authFetch(
+                `${API_URL}/api/class-teacher/report-submissions`,
+                {
+                    method: "POST",
+                    body: {
+                        class: studentClass,
+                        term,
+                        year: Number(year),
+                        assessment: activeAssessment,
+                        note: ""
+                    }
+                }
+            );
 
-        setSending(false);
-        setSent(true);
+            if (response.status === 401) {
+                logoutToLogin();
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message ||
+                    data.error ||
+                    `Submission failed. Server returned HTTP ${response.status}.`
+                );
+            }
+
+            setSent(true);
+            setSubmissionMessage(
+                data.message ||
+                `${activeAssessment} report submitted successfully.`
+            );
+        } catch (error) {
+            console.error("Report submission error:", error);
+            setSent(false);
+            setSubmissionError(
+                error.message ||
+                "Could not submit the report. Check your connection and try again."
+            );
+        } finally {
+            setSending(false);
+        }
     }
+
 
     // =====================================================
     // PAGE
@@ -627,6 +981,10 @@ export default function ClassTeacher() {
     const submittedSubjects = activeAssessment
         ? getSubmittedSubjects(activeAssessment)
         : [];
+
+    const openStudentRemark = reportRow
+        ? remarks[reportRow.student.student_id] || null
+        : null;
 
     return (
         <Layout role="classTeacher">
@@ -674,7 +1032,13 @@ export default function ClassTeacher() {
                         <HeaderStat
                             icon={<FiCheckCircle />}
                             label="Status"
-                            value={allSubmitted ? "Complete" : "Pending"}
+                            value={
+                                activeAssessment
+                                    ? allSubmitted
+                                        ? `${activeAssessment} complete`
+                                        : `${activeAssessment} pending`
+                                    : "No assessment"
+                            }
                         />
 
                     </div>
@@ -744,7 +1108,34 @@ export default function ClassTeacher() {
 
                         </div>
 
-                        {/* CLASS (CHANGED: only his own class or classes) */}
+                        {/* ASSESSMENT */}
+
+                        <div className="filter-field">
+
+                            <label>Assessment</label>
+
+                            <div className="select-wrapper">
+
+                                <select
+                                    value={assessmentFilter}
+                                    onChange={(e) => {
+                                        setAssessmentFilter(e.target.value);
+                                        setSelectedAssessment("");
+                                        setStream("all");
+                                    }}
+                                >
+                                    {ASSESSMENT_ORDER.map((assessment) => (
+                                        <option key={assessment} value={assessment}>
+                                            {assessment}
+                                        </option>
+                                    ))}
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                        {/* CLASS (only his own class or classes) */}
 
                         <div className="filter-field">
 
@@ -848,6 +1239,48 @@ export default function ClassTeacher() {
                     </div>
 
                 )}
+
+                {/* =================================================
+                    SIGNATURE (class teacher signs once)
+                ================================================= */}
+
+                <SectionLabel
+                    icon={<FiEdit3 />}
+                    eyebrow="Sign once"
+                >
+                    Class teacher signature
+                </SectionLabel>
+
+                <div className="sign-setup">
+
+                    <p className="sign-setup-note">
+                        Type your name once and press Sign. Your signature
+                        is saved and appears automatically on every
+                        student's report card for{" "}
+                        {studentClass || "your class"}.
+                    </p>
+
+                    <div className="sign-setup-grid">
+
+                        <SignatureSetup
+                            label="Class teacher signature"
+                            hint={
+                                studentClass
+                                    ? `Used on every ${studentClass} report`
+                                    : "Waiting for your class"
+                            }
+                            placeholder="Type your name to sign"
+                            sign={teacherSign}
+                            disabled={!studentClass}
+                            saving={signSaving}
+                            error={signError}
+                            onSign={saveTeacherSign}
+                            onRemove={() => saveTeacherSign("")}
+                        />
+
+                    </div>
+
+                </div>
 
                 {/* =================================================
                     ASSESSMENT TABS (one assessment at a time)
@@ -1167,6 +1600,7 @@ export default function ClassTeacher() {
                                         <th>Total</th>
                                         <th>Average</th>
                                         <th>Aggregate</th>
+                                        <th>Report</th>
 
                                     </tr>
 
@@ -1179,7 +1613,7 @@ export default function ClassTeacher() {
                                         <tr>
                                             <td
                                                 colSpan={
-                                                    assessmentSubjects.length + 5
+                                                    assessmentSubjects.length + 6
                                                 }
                                                 className="marks-empty-row"
                                             >
@@ -1241,11 +1675,23 @@ export default function ClassTeacher() {
 
                                                     </td>
 
-                                                    {/* STUDENT */}
+                                                    {/* STUDENT (click opens the report card) */}
 
                                                     <td className="student-cell">
 
-                                                        <div className="student-inner">
+                                                        <button
+                                                            type="button"
+                                                            className="student-open"
+                                                            title="Open report card"
+                                                            disabled={!remarksLoaded}
+                                                            onClick={() =>
+                                                                openReport({
+                                                                    student,
+                                                                    aggregate,
+                                                                    position,
+                                                                })
+                                                            }
+                                                        >
 
                                                             <span className="student-avatar">
                                                                 {getSubjectInitial(
@@ -1268,7 +1714,7 @@ export default function ClassTeacher() {
 
                                                             </div>
 
-                                                        </div>
+                                                        </button>
 
                                                     </td>
 
@@ -1365,6 +1811,28 @@ export default function ClassTeacher() {
                                                             </span>
 
                                                         )}
+
+                                                    </td>
+
+                                                    {/* REPORT BUTTON */}
+
+                                                    <td className="report-cell">
+
+                                                        <button
+                                                            type="button"
+                                                            className="view-report-btn"
+                                                            disabled={!remarksLoaded}
+                                                            onClick={() =>
+                                                                openReport({
+                                                                    student,
+                                                                    aggregate,
+                                                                    position,
+                                                                })
+                                                            }
+                                                        >
+                                                            <FiEye />
+                                                            View
+                                                        </button>
 
                                                     </td>
 
@@ -1466,67 +1934,122 @@ export default function ClassTeacher() {
                     SEND REPORT
                 ================================================= */}
 
+                {/* =================================================
+    SEND REPORT TO ADMIN — BACKEND CONNECTED
+================================================= */}
                 <div className="send-report-area">
-
                     <div className="send-report-content">
-
                         <div className="send-report-icon">
                             <FiSend />
                         </div>
 
                         <div>
-
-                            <h3>Ready to submit the class report?</h3>
+                            <h3>Submit assessment report to admin</h3>
 
                             <p>
-                                The report can be sent to the administrator
-                                once all required subject marks have been
-                                submitted.
+                                Submit the marks for{" "}
+                                <strong>
+                                    {activeAssessment || "no assessment selected"}
+                                </strong>
+                                {" "}for {studentClass || "your class"}, {term} {year}.
+                                Only the selected assessment must be complete.
+                                Other assessments can remain incomplete.
                             </p>
-
                         </div>
-
                     </div>
 
                     <button
+                        type="button"
                         className={
-                            allSubmitted
+                            allSubmitted && !sent
                                 ? "send-report-button"
                                 : "send-report-button disabled"
                         }
                         onClick={handleSendToAdmin}
-                        disabled={!allSubmitted || sending}
+                        disabled={
+                            !allSubmitted ||
+                            sending ||
+                            sent ||
+                            !activeAssessment ||
+                            !studentClass
+                        }
                     >
-
-                        <FiSend className={sending ? "spin" : ""} />
-
-                        {sending ? "Sending..." : "Send report to admin"}
-
-                    </button>
-
-                    {!allSubmitted &&
-                        submissionsExist(allExpectedSubmissions) && (
-
-                            <p className="waiting-message">
-                                <FiAlertCircle />
-                                Some required subject marks are still
-                                outstanding.
-                            </p>
-
+                        {sending ? (
+                            <FiLoader className="spin" />
+                        ) : sent ? (
+                            <FiCheckCircle />
+                        ) : (
+                            <FiSend />
                         )}
 
-                    {sent && (
+                        {sending
+                            ? "Submitting to admin..."
+                            : sent
+                                ? "Report submitted"
+                                : "Send report to admin"}
+                    </button>
 
-                        <p className="success-message">
-                            <FiCheckCircle />
-                            Report sent to admin.
+                    {!allSubmitted && activeAssessment && (
+                        <p className="waiting-message" role="status">
+                            <FiAlertCircle />
+                            Complete the required marks for {activeAssessment} before
+                            submitting this assessment.
                         </p>
-
                     )}
 
+                    {submissionError && (
+                        <p className="waiting-message" role="alert">
+                            <FiAlertCircle />
+                            {submissionError}
+                        </p>
+                    )}
+
+                    {sent && (
+                        <p className="success-message" role="status">
+                            <FiCheckCircle />
+                            {submissionMessage}
+                        </p>
+                    )}
                 </div>
 
             </div>
+
+            {/* =================================================
+                REPORT CARD POPUP
+            ================================================= */}
+
+            {reportRow && remarksLoaded && (
+
+                <ReportCard
+                    key={reportRow.student.student_id}
+                    student={reportRow.student}
+                    assessment={activeAssessment}
+                    subjects={assessmentSubjects}
+                    position={reportRow.position}
+                    aggregate={reportRow.aggregate}
+                    classSize={
+                        allRows.filter((row) => row.position !== null)
+                            .length
+                    }
+                    term={term}
+                    year={year}
+                    studentClass={studentClass}
+                    teacherSign={teacherSign}
+                    nextTermBegins={
+                        (openStudentRemark &&
+                            openStudentRemark.next_term_begins) || ""
+                    }
+                    savedRemark={openStudentRemark}
+                    onSaved={(remark) =>
+                        setRemarks((previous) => ({
+                            ...previous,
+                            [remark.student_id]: remark,
+                        }))
+                    }
+                    onClose={() => setReportRow(null)}
+                />
+
+            )}
 
         </Layout>
     );
@@ -1576,6 +2099,1191 @@ function HeaderStat({ icon, label, value }) {
 
         </div>
     );
+}
+
+// =========================================================
+// SIGNATURE SETUP (on the main page, sign once)
+// The teacher types his name and presses Sign. The name is
+// saved on the server (POST) and shown in signature style.
+// =========================================================
+
+function SignatureSetup({
+                            label,
+                            hint,
+                            placeholder,
+                            sign,
+                            disabled = false,
+                            saving = false,
+                            error = "",
+                            onSign,
+                            onRemove,
+                        }) {
+
+    const [draft, setDraft] = useState(sign.name);
+
+    // when the saved name changes (class switched, saved, removed)
+    useEffect(() => {
+        setDraft(sign.name);
+    }, [sign.name]);
+
+    const trimmed = draft.trim();
+    const canSign = !disabled && !saving && trimmed && trimmed !== sign.name;
+
+    return (
+
+        <div className="sign-setup-card">
+
+            <div className="sign-setup-top">
+
+                <div>
+                    <strong>{label}</strong>
+                    <small>{hint}</small>
+                </div>
+
+                {sign.name && (
+                    <button
+                        type="button"
+                        className="sign-setup-clear"
+                        onClick={onRemove}
+                        disabled={saving}
+                        title="Remove signature"
+                    >
+                        <FiTrash2 />
+                        Remove
+                    </button>
+                )}
+
+            </div>
+
+            <input
+                type="text"
+                className="sign-setup-input"
+                placeholder={placeholder}
+                value={draft}
+                maxLength={40}
+                disabled={disabled || saving}
+                onChange={(e) => setDraft(e.target.value)}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter" && canSign) {
+                        onSign(trimmed);
+                    }
+                }}
+            />
+
+            <button
+                type="button"
+                className="load-marks-button"
+                disabled={!canSign}
+                onClick={() => onSign(trimmed)}
+            >
+                {saving ? (
+                    <FiLoader className="spin" />
+                ) : (
+                    <FiEdit3 />
+                )}
+                {saving ? "Saving..." : sign.name ? "Update signature" : "Sign"}
+            </button>
+
+            {error && (
+                <p className="waiting-message">
+                    <FiAlertCircle />
+                    {error}
+                </p>
+            )}
+
+            <div className="sign-setup-preview">
+
+                {sign.name ? (
+                    <>
+                        <span className="rc-signature">{sign.name}</span>
+                        {sign.signedOn && (
+                            <span className="rc-sign-date">
+                                {formatDate(sign.signedOn)}
+                            </span>
+                        )}
+                    </>
+                ) : (
+                    <span className="sign-setup-empty">Not signed yet</span>
+                )}
+
+            </div>
+
+        </div>
+    );
+}
+
+// =========================================================
+// REPORT CARD (same A4 design as the parent Results page)
+// Popup preview + Print / Save PDF
+//
+// The system fills in general conduct, the class teacher's
+// comment and the head teacher's comment from the student's
+// average. The class teacher can edit or remove any of them,
+// and can bring the suggested text back with one click.
+//
+// SAVING: changes are sent to the server (POST
+// /api/class-teacher/report-remarks) about 0.7 seconds after
+// the teacher stops typing, and again when the card is closed.
+//
+// null  = not touched, the system suggestion is shown
+// ""    = the teacher removed it on purpose
+//
+// The class teacher signature comes from the Signature section
+// on the page. There is no head teacher signature, and the
+// class teacher does not type the next term date.
+// =========================================================
+
+const GRADE_REMARKS = {
+    D1: "Outstanding",
+    D2: "Very good",
+    C3: "Good",
+    C4: "Fairly good",
+    C5: "Fair",
+    C6: "Satisfactory",
+    P7: "Pass",
+    P8: "Weak pass",
+    F9: "Fail",
+};
+
+const REPORT_GRADING_KEY = [
+    { grade: "D1 - D2", points: "1 - 2", meaning: "Distinction" },
+    { grade: "C3 - C6", points: "3 - 6", meaning: "Credit" },
+    { grade: "P7 - P8", points: "7 - 8", meaning: "Pass" },
+    { grade: "F9", points: "9", meaning: "Fail" },
+];
+
+const CONDUCT_OPTIONS = [
+    "Excellent",
+    "Very good",
+    "Good",
+    "Fair",
+    "Needs improvement",
+];
+
+// ---------------------------------------------------------
+// SYSTEM SUGGESTED REMARKS (based on the average)
+// ---------------------------------------------------------
+
+function getSuggestedConduct(average) {
+
+    if (average >= 80) {
+        return "Excellent";
+    }
+
+    if (average >= 65) {
+        return "Very good";
+    }
+
+    if (average >= 50) {
+        return "Good";
+    }
+
+    if (average >= 35) {
+        return "Fair";
+    }
+
+    return "Needs improvement";
+}
+
+function getTeacherComment(average) {
+
+    if (average >= 80) {
+        return "An outstanding performance. Keep it up.";
+    }
+
+    if (average >= 65) {
+        return "A very good result. Aim even higher next time.";
+    }
+
+    if (average >= 50) {
+        return "Good effort. More practice will lift your results.";
+    }
+
+    if (average >= 35) {
+        return "A fair result. Please put in more work in the weak subjects.";
+    }
+
+    return "Needs serious improvement. Extra support and daily revision are advised.";
+}
+
+function getHeadComment(average) {
+
+    if (average >= 80) {
+        return "Excellent results. The school is proud of you. Keep up this high standard.";
+    }
+
+    if (average >= 65) {
+        return "A very good performance. Keep working hard and you will do even better.";
+    }
+
+    if (average >= 50) {
+        return "A good result. With more effort and discipline, you can improve further.";
+    }
+
+    if (average >= 35) {
+        return "A fair performance. You are encouraged to work harder and seek help in the weak subjects.";
+    }
+
+    return "The result is below expectation. Serious effort, close supervision and daily revision are needed.";
+}
+
+function ordinal(n) {
+
+    const v = n % 100;
+    const s = ["th", "st", "nd", "rd"];
+
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
+function formatDate(d) {
+
+    if (!d) {
+        return "";
+    }
+
+    return new Date(d).toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    });
+}
+
+// Crop to a passport shape (3:4) and shrink, so it stays small
+function resizePhoto(file) {
+
+    return new Promise((resolve, reject) => {
+
+        const reader = new FileReader();
+
+        reader.onerror = () => reject(new Error("Could not read the photo"));
+
+        reader.onload = () => {
+
+            const img = new Image();
+
+            img.onerror = () => reject(new Error("This is not a valid image"));
+
+            img.onload = () => {
+
+                const width = 300;
+                const height = 400;
+
+                const canvas = document.createElement("canvas");
+                canvas.width = width;
+                canvas.height = height;
+
+                const scale = Math.max(
+                    width / img.width,
+                    height / img.height
+                );
+
+                const drawW = img.width * scale;
+                const drawH = img.height * scale;
+
+                canvas
+                    .getContext("2d")
+                    .drawImage(
+                        img,
+                        (width - drawW) / 2,
+                        (height - drawH) / 2,
+                        drawW,
+                        drawH
+                    );
+
+                resolve(canvas.toDataURL("image/jpeg", 0.85));
+            };
+
+            img.src = reader.result;
+        };
+
+        reader.readAsDataURL(file);
+    });
+}
+
+// ---------------------------------------------------------
+// POPUP: edit + preview on screen, print a clean A4 sheet
+// ---------------------------------------------------------
+
+function ReportCard({ onClose, savedRemark, onSaved, ...sheetProps }) {
+
+    const { student, assessment, term, year } = sheetProps;
+
+    const photoKey = `ct-photo:${student.student_id}`;
+
+    const [printing, setPrinting] = useState(false);
+    const [photoError, setPhotoError] = useState("");
+
+    // what the teacher changed (null = still the system suggestion)
+    const [extras, setExtras] = useState(() => ({
+        conduct: savedRemark ? savedRemark.conduct : null,
+        teacherComment: savedRemark ? savedRemark.teacher_comment : null,
+        headComment: savedRemark ? savedRemark.head_comment : null,
+    }));
+
+    // saving to the server
+    const [saveState, setSaveState] = useState("idle"); // idle | pending | saving | saved | error
+    const [saveError, setSaveError] = useState("");
+
+    const latestExtras = useRef(extras);
+    const dirty = useRef(false);
+    const timer = useRef(null);
+    const saveNowRef = useRef(null);
+
+    // passport photo (kept for the student, not per assessment)
+    const [photo, setPhoto] = useState(
+        () => readSaved(photoKey, "") || student.photo || ""
+    );
+
+    async function saveNow() {
+
+        clearTimeout(timer.current);
+        timer.current = null;
+
+        if (!dirty.current) {
+            return;
+        }
+
+        dirty.current = false;
+
+        const current = latestExtras.current;
+
+        setSaveState("saving");
+        setSaveError("");
+
+        try {
+
+            const { response, data } = await authFetch(
+                `${API_URL}/api/class-teacher/report-remarks`,
+                {
+                    method: "POST",
+                    body: {
+                        student_id: student.student_id,
+                        term,
+                        year,
+                        assessment,
+                        conduct: current.conduct ?? null,
+                        teacher_comment: current.teacherComment ?? null,
+                        head_comment: current.headComment ?? null,
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(
+                    response.status === 401
+                        ? "Your session has expired. Please log in again."
+                        : data.message || "Could not save the remarks"
+                );
+            }
+
+            onSaved(data.remark);
+
+            // something was typed while saving: it will save next
+            setSaveState(dirty.current ? "pending" : "saved");
+
+        } catch (err) {
+
+            console.error("Error saving remarks:", err);
+
+            dirty.current = true;
+            setSaveError(err.message || "Could not save the remarks");
+            setSaveState("error");
+        }
+    }
+
+    // always points to the newest saveNow
+    saveNowRef.current = saveNow;
+
+    function updateExtras(patch) {
+
+        const next = { ...latestExtras.current, ...patch };
+
+        latestExtras.current = next;
+        setExtras(next);
+
+        dirty.current = true;
+        setSaveState("pending");
+
+        clearTimeout(timer.current);
+        timer.current = setTimeout(() => saveNowRef.current(), 700);
+    }
+
+    // save anything still waiting when the card closes
+    useEffect(() => {
+
+        return () => {
+            saveNowRef.current();
+        };
+
+    }, []);
+
+    async function handlePhotoPick(e) {
+
+        const file = e.target.files && e.target.files[0];
+
+        e.target.value = "";
+
+        if (!file) {
+            return;
+        }
+
+        if (!file.type.startsWith("image/")) {
+            setPhotoError("Please choose an image file.");
+            return;
+        }
+
+        if (file.size > 8 * 1024 * 1024) {
+            setPhotoError("The photo is too large. Use one under 8 MB.");
+            return;
+        }
+
+        try {
+            const dataUrl = await resizePhoto(file);
+            setPhoto(dataUrl);
+            writeSaved(photoKey, dataUrl);
+            setPhotoError("");
+        } catch (err) {
+            setPhotoError(err.message || "Could not use this photo.");
+        }
+    }
+
+    function handlePhotoRemove() {
+
+        setPhoto("");
+        writeSaved(photoKey, "");
+    }
+
+    // Close with Escape, and stop the page behind from scrolling
+    useEffect(() => {
+
+        function onKey(e) {
+            if (e.key === "Escape") {
+                onClose();
+            }
+        }
+
+        document.addEventListener("keydown", onKey);
+
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+
+        return () => {
+            document.removeEventListener("keydown", onKey);
+            document.body.style.overflow = previousOverflow;
+        };
+
+    }, [onClose]);
+
+    // Clean up after printing (or if the popup closes)
+    useEffect(() => {
+
+        function finishPrint() {
+            setPrinting(false);
+            document.body.classList.remove("rc-printing");
+            const style = document.getElementById("rc-page-style");
+            if (style) {
+                style.remove();
+            }
+        }
+
+        window.addEventListener("afterprint", finishPrint);
+
+        return () => {
+            window.removeEventListener("afterprint", finishPrint);
+            finishPrint();
+        };
+
+    }, []);
+
+    function handlePrint() {
+
+        // A4 with no browser margin, only while this report prints
+        const style = document.createElement("style");
+        style.id = "rc-page-style";
+        style.textContent = "@page { size: A4; margin: 0; }";
+        document.head.appendChild(style);
+
+        document.body.classList.add("rc-printing");
+
+        setPrinting(true);
+
+        // wait for the print sheet to render
+        setTimeout(() => window.print(), 200);
+    }
+
+    const statusText = {
+        idle: "",
+        pending: "Unsaved changes...",
+        saving: "Saving...",
+        saved: "All changes saved",
+        error: saveError,
+    }[saveState];
+
+    return (
+
+        <div
+            className="rc-overlay"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Report card for ${student.student_name}`}
+            onMouseDown={(e) => {
+                if (e.target === e.currentTarget) {
+                    onClose();
+                }
+            }}
+        >
+
+            <div className="rc-dialog">
+
+                {/* TOOLBAR (not printed) */}
+
+                <div className="rc-toolbar">
+
+                    <div className="rc-toolbar-title">
+                        <strong>Report card</strong>
+                        <small>
+                            Remarks are filled in by the system. Click a
+                            highlighted field to change or remove it.
+                            Changes save automatically.
+                            {statusText ? ` ${statusText}` : ""}
+                        </small>
+                    </div>
+
+                    <div className="rc-toolbar-actions">
+
+                        <button
+                            type="button"
+                            className="rc-btn rc-btn-primary"
+                            onClick={handlePrint}
+                        >
+                            <FiPrinter />
+                            Print / Save PDF
+                        </button>
+
+                        <button
+                            type="button"
+                            className="rc-btn rc-btn-icon"
+                            onClick={onClose}
+                            aria-label="Close report card"
+                        >
+                            <FiX />
+                        </button>
+
+                    </div>
+
+                </div>
+
+                {photoError && (
+                    <div className="rc-notice" role="alert">
+                        {photoError}
+                    </div>
+                )}
+
+                {saveState === "error" && (
+                    <div className="rc-notice" role="alert">
+                        {saveError} Your changes are still on screen, they
+                        will be sent again when you type or close this card.
+                    </div>
+                )}
+
+                {/* PREVIEW (editable) */}
+
+                <div className="rc-scroll">
+
+                    <ReportSheet
+                        {...sheetProps}
+                        extras={extras}
+                        photo={photo}
+                        editable
+                        onExtras={updateExtras}
+                        onPhotoPick={handlePhotoPick}
+                        onPhotoRemove={handlePhotoRemove}
+                    />
+
+                </div>
+
+            </div>
+
+            {/* PRINT SHEET: rendered straight into <body> so it prints cleanly */}
+
+            {printing &&
+                createPortal(
+                    <div className="report-sheet">
+                        <ReportSheet
+                            {...sheetProps}
+                            extras={extras}
+                            photo={photo}
+                        />
+                    </div>,
+                    document.body
+                )}
+
+        </div>
+    );
+}
+
+// ---------------------------------------------------------
+// THE REPORT CARD PAPER
+// editable = true on screen, false on the print sheet
+// ---------------------------------------------------------
+
+function ReportSheet({
+                         student,
+                         assessment,
+                         subjects,
+                         position,
+                         aggregate,
+                         classSize,
+                         term,
+                         year,
+                         studentClass,
+                         teacherSign = { name: "", signedOn: "" },
+                         nextTermBegins = "",
+                         extras = {},
+                         photo = "",
+                         editable = false,
+                         onExtras = () => {},
+                         onPhotoPick = () => {},
+                         onPhotoRemove = () => {},
+                     }) {
+
+    const conductListId = useId();
+
+    const marks = (student.marks || []).filter(
+        (mark) => mark.assessment === assessment
+    );
+
+    const rows = subjects.map((subject) => {
+
+        const mark = marks.find((m) => m.subject === subject);
+
+        const grade = mark
+            ? String(mark.grade || "").trim().toUpperCase()
+            : "";
+
+        return {
+            subject,
+            score: mark ? mark.score : null,
+            grade,
+            points: GRADE_POINTS[grade] ?? null,
+            remark: GRADE_REMARKS[grade] || "",
+        };
+    });
+
+    const scored = rows.filter((row) => row.score !== null);
+
+    const total = scored.reduce(
+        (sum, row) => sum + Number(row.score || 0),
+        0
+    );
+
+    const average = scored.length > 0 ? total / scored.length : 0;
+
+    const hasPosition = position !== null && position !== undefined;
+
+    const feesBalance = student.fees_balance;
+
+    // Remarks: what the teacher saved wins, then the server value
+    // (conduct only), then the system suggestion.
+    // null = not touched, "" = removed on purpose.
+    const suggestedConduct = scored.length > 0
+        ? getSuggestedConduct(average)
+        : "";
+    const suggestedTeacherComment = scored.length > 0
+        ? getTeacherComment(average)
+        : "";
+    const suggestedHeadComment = scored.length > 0
+        ? getHeadComment(average)
+        : "";
+
+    const conduct =
+        extras.conduct ?? student.conduct ?? suggestedConduct;
+    const teacherComment =
+        extras.teacherComment ?? suggestedTeacherComment;
+    const headComment =
+        extras.headComment ?? suggestedHeadComment;
+
+    return (
+
+        <section className="rc-page">
+
+            <div className="rc-frame">
+
+                <span className="rc-watermark">
+                    {SCHOOL.name.charAt(0)}
+                </span>
+
+                {/* School header */}
+
+                <header className="rc-head">
+
+                    <div className="rc-crest">
+                        {SCHOOL.name.charAt(0)}
+                    </div>
+
+                    <div className="rc-school">
+                        <h1>{SCHOOL.name}</h1>
+                        <p className="rc-motto">"{SCHOOL.motto}"</p>
+                        <p className="rc-contact">
+                            {SCHOOL.address} &nbsp;|&nbsp; {SCHOOL.phone}{" "}
+                            &nbsp;|&nbsp; {SCHOOL.email}
+                        </p>
+                    </div>
+
+                    {/* Passport photo (optional) */}
+
+                    <div className="rc-photo">
+
+                        {photo ? (
+                            <img src={photo} alt={student.student_name} />
+                        ) : (
+                            <span>Passport photo</span>
+                        )}
+
+                        {editable && (
+
+                            <>
+                                <label className="rc-photo-edit">
+                                    <FiCamera />
+                                    {photo ? "Change" : "Add"}
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={onPhotoPick}
+                                    />
+                                </label>
+
+                                {photo && (
+                                    <button
+                                        type="button"
+                                        className="rc-photo-remove"
+                                        onClick={onPhotoRemove}
+                                        aria-label="Remove photo"
+                                        title="Remove photo"
+                                    >
+                                        <FiTrash2 />
+                                    </button>
+                                )}
+                            </>
+
+                        )}
+
+                    </div>
+
+                </header>
+
+                <div className="rc-banner">
+                    {assessment} Report Card &mdash; {term}, {year}
+                </div>
+
+                {/* Pupil details */}
+
+                <div className="rc-bio">
+
+                    <BioField
+                        label="Pupil's name"
+                        value={student.student_name}
+                        wide
+                    />
+
+                    <BioField
+                        label="Class"
+                        value={`${studentClass}${
+                            student.stream ? " " + student.stream : ""
+                        }`}
+                    />
+
+                    <BioField
+                        label="Student ID"
+                        value={student.student_id}
+                    />
+
+                    <BioField label="Gender" value={student.gender || ""} />
+
+                    <BioField
+                        label="Term / Year"
+                        value={`${term}, ${year}`}
+                    />
+
+                    <BioField label="Assessment" value={assessment} />
+
+                    <BioField
+                        label="Position in class"
+                        value={
+                            hasPosition
+                                ? `${ordinal(position)} out of ${classSize}`
+                                : "Not ranked"
+                        }
+                    />
+
+                </div>
+
+                {/* Marks */}
+
+                <table className="rc-marks">
+
+                    <thead>
+
+                    <tr>
+                        <th className="rc-left">Subject</th>
+                        <th>
+                            Score<small>/ 100</small>
+                        </th>
+                        <th>Grade</th>
+                        <th>
+                            Points<small>lower is better</small>
+                        </th>
+                        <th className="rc-left">Teacher's remark</th>
+                    </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    {rows.map((row) => (
+
+                        <tr key={row.subject}>
+
+                            <td className="rc-left rc-subject">
+                                {row.subject}
+                            </td>
+
+                            <td className="rc-total">
+                                {row.score !== null ? row.score : ""}
+                            </td>
+
+                            <td>
+                                {row.grade ? (
+                                    <span
+                                        className={`rc-grade ${getReportGradeClass(
+                                            row.grade
+                                        )}`}
+                                    >
+                                        {row.grade}
+                                    </span>
+                                ) : (
+                                    ""
+                                )}
+                            </td>
+
+                            <td>{row.points !== null ? row.points : ""}</td>
+
+                            <td className="rc-left rc-remark">
+                                {row.remark}
+                            </td>
+
+                        </tr>
+
+                    ))}
+
+                    </tbody>
+
+                    <tfoot>
+
+                    <tr>
+
+                        <td className="rc-left">Total marks</td>
+
+                        <td className="rc-total">{total}</td>
+
+                        <td colSpan={3} className="rc-left">
+                            Average <b>{average.toFixed(1)}%</b>{" "}
+                            &nbsp;&middot;&nbsp; Aggregate{" "}
+                            <b>
+                                {aggregate !== null && aggregate !== undefined
+                                    ? aggregate
+                                    : "-"}
+                            </b>{" "}
+                            &nbsp;&middot;&nbsp; Position{" "}
+                            <b>{hasPosition ? ordinal(position) : "-"}</b>
+                        </td>
+
+                    </tr>
+
+                    </tfoot>
+
+                </table>
+
+                {/* Key + conduct */}
+
+                <div className="rc-row">
+
+                    <div className="rc-box rc-key">
+
+                        <h3>Grading key</h3>
+
+                        {REPORT_GRADING_KEY.map((k) => (
+
+                            <div key={k.grade} className="rc-key-line">
+                                <b>{k.grade}</b>
+                                <span>Points {k.points}</span>
+                                <em>{k.meaning}</em>
+                            </div>
+
+                        ))}
+
+                    </div>
+
+                    <div className="rc-box">
+
+                        <h3>
+                            General conduct
+                            {editable && (
+                                <ResetRemark
+                                    visible={extras.conduct != null}
+                                    onClick={() =>
+                                        onExtras({ conduct: null })
+                                    }
+                                />
+                            )}
+                        </h3>
+
+                        {editable ? (
+
+                            <>
+                                <input
+                                    type="text"
+                                    className="rc-edit"
+                                    list={conductListId}
+                                    placeholder="Choose or type"
+                                    value={conduct}
+                                    onChange={(e) =>
+                                        onExtras({ conduct: e.target.value })
+                                    }
+                                />
+
+                                <datalist id={conductListId}>
+                                    {CONDUCT_OPTIONS.map((option) => (
+                                        <option key={option} value={option} />
+                                    ))}
+                                </datalist>
+                            </>
+
+                        ) : (
+
+                            <p
+                                className={`rc-conduct ${
+                                    conduct ? "" : "rc-blank"
+                                }`}
+                            >
+                                {conduct}
+                            </p>
+
+                        )}
+
+                        <h3>Fees balance</h3>
+
+                        <p
+                            className={`rc-conduct ${
+                                feesBalance === undefined ||
+                                feesBalance === null
+                                    ? "rc-blank"
+                                    : ""
+                            }`}
+                        >
+                            {feesBalance === undefined || feesBalance === null
+                                ? ""
+                                : Number(feesBalance) === 0
+                                    ? "Cleared"
+                                    : `UGX ${Number(feesBalance).toLocaleString()}`}
+                        </p>
+
+                        {/* Not typed by the class teacher: it only shows
+                            the date when the school has set one. */}
+
+                        <h3>Next term begins</h3>
+
+                        <p
+                            className={`rc-conduct ${
+                                nextTermBegins ? "" : "rc-blank"
+                            }`}
+                        >
+                            {formatDate(nextTermBegins)}
+                        </p>
+
+                    </div>
+
+                </div>
+
+                {/* Class teacher's comment + his signature (from the page) */}
+
+                <div className="rc-comment">
+
+                    <h3>
+                        Class teacher's comment
+                        {editable && (
+                            <ResetRemark
+                                visible={extras.teacherComment != null}
+                                onClick={() =>
+                                    onExtras({ teacherComment: null })
+                                }
+                            />
+                        )}
+                    </h3>
+
+                    {editable ? (
+
+                        <textarea
+                            className="rc-edit rc-edit-area"
+                            rows={2}
+                            placeholder="Write the class teacher's comment"
+                            value={teacherComment}
+                            onChange={(e) =>
+                                onExtras({ teacherComment: e.target.value })
+                            }
+                        />
+
+                    ) : (
+
+                        <p>{teacherComment}</p>
+
+                    )}
+
+                    <SignatureDisplay sign={teacherSign} />
+
+                </div>
+
+                {/* Head teacher's comment (no signature) */}
+
+                <div className="rc-comment">
+
+                    <h3>
+                        {SCHOOL.headTeacher}'s comment
+                        {editable && (
+                            <ResetRemark
+                                visible={extras.headComment != null}
+                                onClick={() =>
+                                    onExtras({ headComment: null })
+                                }
+                            />
+                        )}
+                    </h3>
+
+                    {editable ? (
+
+                        <textarea
+                            className="rc-edit rc-edit-area"
+                            rows={2}
+                            placeholder="Write the head teacher's comment"
+                            value={headComment}
+                            onChange={(e) =>
+                                onExtras({ headComment: e.target.value })
+                            }
+                        />
+
+                    ) : (
+
+                        <p>{headComment}</p>
+
+                    )}
+
+                </div>
+
+            </div>
+
+        </section>
+    );
+}
+
+// ---------------------------------------------------------
+// "USE SUGGESTED" BUTTON
+// Shows only after the teacher changed the system remark.
+// Never printed, because it is only rendered when editable.
+// ---------------------------------------------------------
+
+function ResetRemark({ visible, onClick }) {
+
+    if (!visible) {
+        return null;
+    }
+
+    return (
+
+        <button
+            type="button"
+            className="rc-reset"
+            onClick={onClick}
+            title="Go back to the system suggestion"
+        >
+            <FiRotateCcw />
+            Use suggested
+        </button>
+    );
+}
+
+// ---------------------------------------------------------
+// SIGNATURE ON THE REPORT (display only)
+// The name is set once on the page, here it is only shown in
+// the handwritten signature style, with the date it was signed.
+// ---------------------------------------------------------
+
+function SignatureDisplay({ sign }) {
+
+    const name = sign && sign.name ? sign.name : "";
+    const signedOn = sign && sign.signedOn ? sign.signedOn : "";
+
+    return (
+
+        <div className="rc-signblock">
+
+            <div className="rc-sign">
+
+                <div className="rc-sign-line">
+
+                    <span className="rc-signature">{name}</span>
+
+                    {name && signedOn && (
+                        <span className="rc-sign-date">
+                            {formatDate(signedOn)}
+                        </span>
+                    )}
+
+                </div>
+
+                <small>Signature &amp; date</small>
+
+            </div>
+
+        </div>
+    );
+}
+
+function BioField({ label, value, wide }) {
+
+    return (
+
+        <div className={`rc-field ${wide ? "rc-field-wide" : ""}`}>
+            <span className="rc-field-label">{label}</span>
+            <span className="rc-field-value">{value}</span>
+        </div>
+    );
+}
+
+// =========================================================
+// GRADE CSS CLASS (report card)
+// =========================================================
+
+function getReportGradeClass(grade) {
+
+    const value = String(grade || "").trim().toUpperCase();
+
+    if (value === "D1" || value === "D2") {
+        return "rc-grade-A";
+    }
+
+    if (["C3", "C4", "C5", "C6"].includes(value)) {
+        return "rc-grade-B";
+    }
+
+    if (value === "P7" || value === "P8") {
+        return "rc-grade-D";
+    }
+
+    if (value === "F9") {
+        return "rc-grade-E";
+    }
+
+    return "";
 }
 
 // =========================================================

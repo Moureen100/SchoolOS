@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -16,9 +17,70 @@ import "./StudentList.css";
 // BACKEND URL
 // =========================================================
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = String(
+    import.meta.env.VITE_API_URL || "http://localhost:5000"
+)
+    .trim()
+    .replace(/\/+$/, "");
 
 const PAGE_SIZES = [25, 50, 100];
+
+// =========================================================
+// AUTHENTICATION HELPERS
+// =========================================================
+
+// Support both token keys used by the existing school login flows.
+// Never log or display the token itself.
+function getAuthToken() {
+    return (
+        localStorage.getItem("token") ||
+        localStorage.getItem("access_token") ||
+        ""
+    ).trim();
+}
+
+function getAuthHeaders(json = false) {
+    const token = getAuthToken();
+
+    if (!token) {
+        throw new Error(
+            "Your school login token is missing. Please log in again."
+        );
+    }
+
+    return {
+        ...(json ? { "Content-Type": "application/json" } : {}),
+        Authorization: `Bearer ${token}`,
+    };
+}
+
+async function readResponse(response) {
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+        const message =
+            data?.message ||
+            data?.error ||
+            (typeof data === "string" ? data : "") ||
+            `Server responded with ${response.status}`;
+
+        if (response.status === 401) {
+            throw new Error(
+                `Authentication failed (401). ${message} Please log in again if your session has expired.`
+            );
+        }
+
+        if (response.status === 403) {
+            throw new Error(
+                `Access denied (403). ${message}`
+            );
+        }
+
+        throw new Error(message);
+    }
+
+    return data;
+}
 
 // =========================================================
 // HELPERS
@@ -33,7 +95,7 @@ function getTeacher(student) {
     );
 }
 
-// Default is ACTIVE unless the backend clearly says inactive
+// Default is ACTIVE unless the backend clearly says inactive.
 function getStatus(student) {
     if (typeof student.is_active === "boolean") {
         return student.is_active ? "active" : "inactive";
@@ -58,9 +120,7 @@ function getInitials(name) {
         .split(/\s+/)
         .filter(Boolean);
 
-    if (parts.length === 0) {
-        return "?";
-    }
+    if (parts.length === 0) return "?";
 
     if (parts.length === 1) {
         return parts[0].charAt(0).toUpperCase();
@@ -92,8 +152,6 @@ export default function StudentList() {
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-
-    // student_id currently being changed (prevents double clicks)
     const [statusUpdating, setStatusUpdating] = useState(null);
 
     // =====================================================
@@ -114,7 +172,7 @@ export default function StudentList() {
     const [page, setPage] = useState(1);
 
     // =====================================================
-    // GET ALL STUDENTS
+    // GET STUDENTS FOR THE AUTHENTICATED SCHOOL
     // =====================================================
 
     async function loadStudents() {
@@ -122,33 +180,26 @@ export default function StudentList() {
         setError("");
 
         try {
-            const res = await fetch(`${API_URL}/students`);
+            const res = await fetch(`${API_URL}/students`, {
+                method: "GET",
+                headers: getAuthHeaders(),
+            });
 
-            let data = [];
-
-            try {
-                data = await res.json();
-            } catch {
-                data = [];
-            }
-
-            if (!res.ok) {
-                throw new Error(
-                    data.message ||
-                    data.error ||
-                    `Server responded with ${res.status}`
-                );
-            }
+            const data = await readResponse(res);
 
             const list = Array.isArray(data)
                 ? data
-                : data.students || [];
+                : Array.isArray(data?.students)
+                    ? data.students
+                    : [];
 
             setStudents(list);
         } catch (err) {
             console.error("Error loading students:", err);
 
-            setError(err.message || "Could not load students");
+            setError(
+                err.message || "Could not load students."
+            );
 
             setStudents([]);
         } finally {
@@ -161,7 +212,7 @@ export default function StudentList() {
     }, []);
 
     // =====================================================
-    // ACTIVATE / DEACTIVATE STUDENT (click the status badge)
+    // ACTIVATE / DEACTIVATE STUDENT
     // =====================================================
 
     async function changeStudentStatus(student) {
@@ -174,7 +225,6 @@ export default function StudentList() {
 
         const currentStatus = getStatus(student);
 
-        // active -> deactivate, inactive -> activate
         const action =
             currentStatus === "active"
                 ? "deactivate"
@@ -185,35 +235,17 @@ export default function StudentList() {
 
         try {
             const res = await fetch(
-                `${API_URL}/students/${studentId}/${action}`,
+                `${API_URL}/students/${encodeURIComponent(
+                    studentId
+                )}/${action}`,
                 {
                     method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: getAuthHeaders(true),
                 }
             );
 
-            let data = null;
+            await readResponse(res);
 
-            try {
-                data = await res.json();
-            } catch {
-                data = null;
-            }
-
-            if (!res.ok) {
-                throw new Error(
-                    data?.message ||
-                    data?.error ||
-                    (typeof data === "string" ? data : "") ||
-                    `Could not ${action} student`
-                );
-            }
-
-            // Update the student in the frontend state.
-            // We set every possible field so getStatus()
-            // always reads the new value.
             const isNowActive = action === "activate";
 
             setStudents((currentStudents) =>
@@ -237,7 +269,8 @@ export default function StudentList() {
             );
 
             setError(
-                err.message || `Could not ${action} student`
+                err.message ||
+                `Could not ${action} student.`
             );
         } finally {
             setStatusUpdating(null);
@@ -286,9 +319,7 @@ export default function StudentList() {
 
     const teacherOptions = [
         ...new Set(
-            students
-                .map(getTeacher)
-                .filter(Boolean)
+            students.map(getTeacher).filter(Boolean)
         ),
     ].sort(sortText);
 
@@ -329,9 +360,7 @@ export default function StudentList() {
             return false;
         }
 
-        if (!searchText) {
-            return true;
-        }
+        if (!searchText) return true;
 
         return (
             String(student.student_name || "")
@@ -373,7 +402,6 @@ export default function StudentList() {
     );
 
     const safePage = Math.min(page, totalPages);
-
     const startIndex = (safePage - 1) * pageSize;
 
     const pageRows = filtered.slice(
@@ -386,12 +414,8 @@ export default function StudentList() {
 
     const showingTo = startIndex + pageRows.length;
 
-    // =====================================================
-    // TABLE COLUMN COUNT
     // Student, Class, Stream, Gender, Contact, Guardian, Status
-    // + Teacher (optional)
-    // =====================================================
-
+    // Plus Teacher when teacher information is available.
     const columnCount = 7 + (hasTeacher ? 1 : 0);
 
     // =====================================================
@@ -405,9 +429,7 @@ export default function StudentList() {
                 {/* PAGE HEADER */}
 
                 <header className="sl-page-header">
-
                     <div className="sl-header-text">
-
                         <h1 className="sl-page-title">
                             Students
                         </h1>
@@ -416,7 +438,6 @@ export default function StudentList() {
                             Every student added to the school, with
                             class, stream and guardian details
                         </p>
-
                     </div>
 
                     <button
@@ -429,13 +450,11 @@ export default function StudentList() {
                         <FiPlus />
                         Add student
                     </button>
-
                 </header>
 
                 {/* SUMMARY */}
 
                 <div className="sl-summary">
-
                     <div className="sl-stat">
                         <span className="sl-stat-label">
                             Total students
@@ -464,7 +483,6 @@ export default function StudentList() {
                             {totalRows}
                         </strong>
                     </div>
-
                 </div>
 
                 {/* ERROR */}
@@ -485,7 +503,6 @@ export default function StudentList() {
                     {/* FILTER HEADER */}
 
                     <div className="sl-table-header">
-
                         <h2 className="sl-table-title">
                             All students
                         </h2>
@@ -495,13 +512,11 @@ export default function StudentList() {
                             {/* SEARCH */}
 
                             <div className="sl-control">
-
                                 <span className="sl-control-label">
                                     Search
                                 </span>
 
                                 <div className="sl-search-input">
-
                                     <FiSearch className="sl-search-icon" />
 
                                     <input
@@ -512,32 +527,24 @@ export default function StudentList() {
                                             setSearch(e.target.value)
                                         }
                                     />
-
                                 </div>
-
                             </div>
 
                             {/* CLASS */}
 
                             <div className="sl-control">
-
                                 <span className="sl-control-label">
                                     Class
                                 </span>
 
                                 <div className="sl-select-wrapper">
-
                                     <select
                                         value={classFilter}
                                         onChange={(e) => {
-                                            setClassFilter(
-                                                e.target.value
-                                            );
-
+                                            setClassFilter(e.target.value);
                                             setStreamFilter("all");
                                         }}
                                     >
-
                                         <option value="all">
                                             All classes
                                         </option>
@@ -550,32 +557,24 @@ export default function StudentList() {
                                                 {c}
                                             </option>
                                         ))}
-
                                     </select>
-
                                 </div>
-
                             </div>
 
                             {/* STREAM */}
 
                             <div className="sl-control">
-
                                 <span className="sl-control-label">
                                     Stream
                                 </span>
 
                                 <div className="sl-select-wrapper">
-
                                     <select
                                         value={streamFilter}
                                         onChange={(e) =>
-                                            setStreamFilter(
-                                                e.target.value
-                                            )
+                                            setStreamFilter(e.target.value)
                                         }
                                     >
-
                                         <option value="all">
                                             All streams
                                         </option>
@@ -588,24 +587,19 @@ export default function StudentList() {
                                                 Stream {s}
                                             </option>
                                         ))}
-
                                     </select>
-
                                 </div>
-
                             </div>
 
                             {/* TEACHER */}
 
                             {hasTeacher && (
                                 <div className="sl-control">
-
                                     <span className="sl-control-label">
                                         Teacher
                                     </span>
 
                                     <div className="sl-select-wrapper">
-
                                         <select
                                             value={teacherFilter}
                                             onChange={(e) =>
@@ -614,7 +608,6 @@ export default function StudentList() {
                                                 )
                                             }
                                         >
-
                                             <option value="all">
                                                 All teachers
                                             </option>
@@ -627,66 +620,45 @@ export default function StudentList() {
                                                     {t}
                                                 </option>
                                             ))}
-
                                         </select>
-
                                     </div>
-
                                 </div>
                             )}
 
                             {/* STATUS */}
 
                             <div className="sl-control">
-
                                 <span className="sl-control-label">
                                     Status
                                 </span>
 
                                 <div className="sl-select-wrapper">
-
                                     <select
                                         value={statusFilter}
                                         onChange={(e) =>
-                                            setStatusFilter(
-                                                e.target.value
-                                            )
+                                            setStatusFilter(e.target.value)
                                         }
                                     >
-
-                                        <option value="all">
-                                            All
-                                        </option>
-
-                                        <option value="active">
-                                            Active
-                                        </option>
-
+                                        <option value="all">All</option>
+                                        <option value="active">Active</option>
                                         <option value="inactive">
                                             Inactive
                                         </option>
-
                                     </select>
-
                                 </div>
-
                             </div>
-
                         </div>
-
                     </div>
 
                     {/* TOOLBAR */}
 
                     <div className="sl-toolbar">
-
                         <span className="sl-count">
                             Showing {showingFrom}–{showingTo} of{" "}
                             {totalRows} students
                         </span>
 
                         <div className="sl-toolbar-right">
-
                             {filtersActive && (
                                 <button
                                     type="button"
@@ -704,28 +676,21 @@ export default function StudentList() {
                                 onClick={loadStudents}
                                 disabled={loading}
                             >
-
                                 <FiRefreshCw
                                     className={
                                         loading ? "sl-spin" : ""
                                     }
                                 />
-
                                 Refresh
-
                             </button>
 
                             <div className="sl-select-wrapper sl-page-size">
-
                                 <select
                                     value={pageSize}
                                     onChange={(e) =>
-                                        setPageSize(
-                                            Number(e.target.value)
-                                        )
+                                        setPageSize(Number(e.target.value))
                                     }
                                 >
-
                                     {PAGE_SIZES.map((size) => (
                                         <option
                                             key={`page-size-${size}`}
@@ -734,23 +699,16 @@ export default function StudentList() {
                                             {size} per page
                                         </option>
                                     ))}
-
                                 </select>
-
                             </div>
-
                         </div>
-
                     </div>
 
                     {/* TABLE */}
 
                     <div className="sl-table-scroll">
-
                         <table className="sl-table">
-
                             <thead>
-
                             <tr>
                                 <th>Student</th>
                                 <th>Class</th>
@@ -761,7 +719,6 @@ export default function StudentList() {
                                 {hasTeacher && <th>Teacher</th>}
                                 <th>Status</th>
                             </tr>
-
                             </thead>
 
                             <tbody>
@@ -781,37 +738,34 @@ export default function StudentList() {
 
                             {/* EMPTY */}
 
-                            {!loading &&
-                                pageRows.length === 0 && (
-                                    <tr key="empty-row">
-                                        <td
-                                            colSpan={columnCount}
-                                            className="sl-empty-row"
-                                        >
-                                            {students.length === 0
+                            {!loading && pageRows.length === 0 && (
+                                <tr key="empty-row">
+                                    <td
+                                        colSpan={columnCount}
+                                        className="sl-empty-row"
+                                    >
+                                        {error
+                                            ? "Students could not be loaded. Check the error above and try refreshing."
+                                            : students.length === 0
                                                 ? "No students have been added yet."
                                                 : "No students match your filters."}
-                                        </td>
-                                    </tr>
-                                )}
+                                    </td>
+                                </tr>
+                            )}
 
                             {/* STUDENTS */}
 
                             {!loading &&
                                 pageRows.map((student, index) => {
-
-                                    const status =
-                                        getStatus(student);
+                                    const status = getStatus(student);
 
                                     const updating =
                                         statusUpdating ===
                                         student.student_id;
 
-                                    // guaranteed unique key
-                                    const rowKey =
-                                        student.student_id
-                                            ? `student-${student.student_id}`
-                                            : `student-row-${startIndex + index}`;
+                                    const rowKey = student.student_id
+                                        ? `student-${student.student_id}`
+                                        : `student-row-${startIndex + index}`;
 
                                     return (
                                         <tr
@@ -827,7 +781,6 @@ export default function StudentList() {
 
                                             <td>
                                                 <div className="sl-student-cell">
-
                                                         <span className="sl-avatar">
                                                             {getInitials(
                                                                 student.student_name
@@ -835,7 +788,6 @@ export default function StudentList() {
                                                         </span>
 
                                                     <div>
-
                                                         <div className="sl-student-name">
                                                             {student.student_name ||
                                                                 "—"}
@@ -845,9 +797,7 @@ export default function StudentList() {
                                                             {student.student_id ||
                                                                 "—"}
                                                         </div>
-
                                                     </div>
-
                                                 </div>
                                             </td>
 
@@ -882,7 +832,6 @@ export default function StudentList() {
 
                                             <td>
                                                 <div className="sl-two-line">
-
                                                         <span>
                                                             {student.phone_number ||
                                                                 "—"}
@@ -891,7 +840,6 @@ export default function StudentList() {
                                                     <small>
                                                         {student.email || ""}
                                                     </small>
-
                                                 </div>
                                             </td>
 
@@ -899,7 +847,6 @@ export default function StudentList() {
 
                                             <td>
                                                 <div className="sl-two-line">
-
                                                         <span>
                                                             {student.guardian_name ||
                                                                 "—"}
@@ -911,7 +858,6 @@ export default function StudentList() {
                                                             : ""}
                                                         {student.phone || ""}
                                                     </small>
-
                                                 </div>
                                             </td>
 
@@ -924,7 +870,7 @@ export default function StudentList() {
                                                 </td>
                                             )}
 
-                                            {/* STATUS (CLICK TO CHANGE) */}
+                                            {/* STATUS */}
 
                                             <td>
                                                 <button
@@ -949,22 +895,17 @@ export default function StudentList() {
                                                             : "Inactive"}
                                                 </button>
                                             </td>
-
                                         </tr>
                                     );
                                 })}
-
                             </tbody>
-
                         </table>
-
                     </div>
 
                     {/* PAGINATION */}
 
                     {!loading && totalRows > 0 && (
                         <div className="sl-pagination">
-
                             <button
                                 type="button"
                                 className="sl-dark-btn"
@@ -997,12 +938,9 @@ export default function StudentList() {
                                 Next
                                 <FiChevronRight />
                             </button>
-
                         </div>
                     )}
-
                 </section>
-
             </div>
         </Layout>
     );

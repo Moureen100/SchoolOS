@@ -21,12 +21,23 @@ import gradBgImage from "../assets/img2/grad.jpg";
 
 const SchoolOSShowcase = () => {
     const navigate = useNavigate();
-    const API_URL = import.meta.env.VITE_API_URL;
+
+    const API_URL = String(import.meta.env.VITE_API_URL || "")
+        .trim()
+        .replace(/\/+$/, "");
 
     const [showCreateAccount, setShowCreateAccount] = useState(false);
+
     const [showPassword, setShowPassword] = useState(false);
     const [showCreatePassword, setShowCreatePassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [showAdminPassword, setShowAdminPassword] = useState(false);
+    const [showConfirmAdminPassword, setShowConfirmAdminPassword] =
+        useState(false);
+
+    // =====================================================
+    // SCHOOL ACCOUNT LOGIN
+    // =====================================================
 
     const [loginData, setLoginData] = useState({
         email: "",
@@ -36,6 +47,11 @@ const SchoolOSShowcase = () => {
     const [loggingIn, setLoggingIn] = useState(false);
     const [loginError, setLoginError] = useState("");
 
+    // =====================================================
+    // SCHOOL REGISTRATION
+    // School and administrator credentials remain separate.
+    // =====================================================
+
     const [schoolData, setSchoolData] = useState({
         schoolName: "",
         schoolEmail: "",
@@ -43,8 +59,12 @@ const SchoolOSShowcase = () => {
         creatorEmail: "",
         creatorPhone: "",
         estimatedStudents: "",
+
         password: "",
         confirmPassword: "",
+
+        adminPassword: "",
+        confirmAdminPassword: "",
     });
 
     const [creatingSchool, setCreatingSchool] = useState(false);
@@ -52,7 +72,7 @@ const SchoolOSShowcase = () => {
     const [schoolError, setSchoolError] = useState("");
 
     // =====================================================
-    // RESET TO A CLEAN LOGIN SCREEN
+    // RESET LOGIN VIEW
     // =====================================================
 
     const resetToCleanLoginView = () => {
@@ -79,7 +99,7 @@ const SchoolOSShowcase = () => {
     }, []);
 
     // =====================================================
-    // LOGIN INPUT
+    // SCHOOL LOGIN INPUT
     // =====================================================
 
     const handleLoginInputChange = (e) => {
@@ -118,27 +138,50 @@ const SchoolOSShowcase = () => {
     };
 
     // =====================================================
-    // SCHOOL LOGIN
-    // Existing login endpoint preserved.
+    // SCHOOL ACCOUNT LOGIN
+    //
+    // Endpoint: /login_school_account
+    //
+    // Uses ONLY:
+    // school_email
+    // password
+    //
+    // Does NOT use:
+    // creator_email
+    // admin_password
     // =====================================================
 
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
+
         setLoginError("");
 
         if (loggingIn) return;
 
+        const schoolEmail = loginData.email.trim().toLowerCase();
+        const schoolPassword = loginData.password;
+
+        if (!schoolEmail || !schoolPassword) {
+            setLoginError(
+                "Please enter your school email and school password."
+            );
+            return;
+        }
+
+        if (!API_URL) {
+            setLoginError(
+                "The SchoolOS API URL is not configured."
+            );
+            return;
+        }
+
         setLoggingIn(true);
 
         try {
-            if (!API_URL) {
-                setLoginError("The SchoolOS API URL is not configured.");
-                return;
-            }
-
+            // SCHOOL ACCOUNT CREDENTIALS ONLY
             const requestData = {
-                school_email: loginData.email.trim(),
-                password: loginData.password,
+                school_email: schoolEmail,
+                password: schoolPassword,
             };
 
             const response = await fetch(
@@ -155,18 +198,25 @@ const SchoolOSShowcase = () => {
             const result = await response.json();
 
             if (!response.ok) {
-                setLoginError(result.message || "Unable to log in.");
+                setLoginError(
+                    result.message ||
+                    "Unable to log in. Please check your school credentials."
+                );
                 return;
             }
 
             if (!result.access_token) {
                 setLoginError(
-                    "Login response did not include an access token."
+                    "School login response did not include an access token."
                 );
                 return;
             }
 
-            localStorage.setItem("access_token", result.access_token);
+            // Save school authentication session.
+            localStorage.setItem(
+                "access_token",
+                result.access_token
+            );
 
             if (result.school) {
                 localStorage.setItem(
@@ -175,24 +225,28 @@ const SchoolOSShowcase = () => {
                 );
             }
 
-            console.log("Logged In School:", result.school);
+            console.log("School account login successful.");
 
             navigate("/roles");
+
         } catch (error) {
-            console.error("Login Error:", error);
+            console.error("School Account Login Error:", error);
+
             setLoginError(
-                "Unable to connect to the SchoolOS server."
+                "Unable to connect to the SchoolOS server. Please try again."
             );
+
         } finally {
             setLoggingIn(false);
         }
     };
 
     // =====================================================
-    // VALIDATE SCHOOL REGISTRATION FORM
+    // VALIDATE SCHOOL REGISTRATION
     // =====================================================
 
     const validateSchoolForm = () => {
+
         if (!schoolData.schoolName.trim()) {
             setSchoolError("School name is required.");
             return false;
@@ -209,12 +263,16 @@ const SchoolOSShowcase = () => {
         }
 
         if (!schoolData.creatorEmail.trim()) {
-            setSchoolError("Your email address is required.");
+            setSchoolError(
+                "Administrator email address is required."
+            );
             return false;
         }
 
         if (!schoolData.creatorPhone.trim()) {
-            setSchoolError("Your phone number is required.");
+            setSchoolError(
+                "Administrator phone number is required."
+            );
             return false;
         }
 
@@ -231,13 +289,43 @@ const SchoolOSShowcase = () => {
 
         if (schoolData.password.length < 8) {
             setSchoolError(
-                "Password must be at least 8 characters long."
+                "The school password must be at least 8 characters long."
             );
             return false;
         }
 
-        if (schoolData.password !== schoolData.confirmPassword) {
-            setSchoolError("Passwords do not match.");
+        if (
+            schoolData.password !== schoolData.confirmPassword
+        ) {
+            setSchoolError(
+                "The school passwords do not match."
+            );
+            return false;
+        }
+
+        if (schoolData.adminPassword.length < 8) {
+            setSchoolError(
+                "The administrator password must be at least 8 characters long."
+            );
+            return false;
+        }
+
+        if (
+            schoolData.adminPassword !==
+            schoolData.confirmAdminPassword
+        ) {
+            setSchoolError(
+                "The administrator passwords do not match."
+            );
+            return false;
+        }
+
+        if (
+            schoolData.password === schoolData.adminPassword
+        ) {
+            setSchoolError(
+                "For better security, use different school and administrator passwords."
+            );
             return false;
         }
 
@@ -245,11 +333,7 @@ const SchoolOSShowcase = () => {
     };
 
     // =====================================================
-    // CREATE SCHOOL ACCOUNT DIRECTLY
-    //
-    // No verification email.
-    // No verification code.
-    // No resend verification request.
+    // CREATE SCHOOL ACCOUNT
     // =====================================================
 
     const handleCreateSchoolAccount = async (e) => {
@@ -259,32 +343,44 @@ const SchoolOSShowcase = () => {
         setSchoolError("");
 
         if (creatingSchool) return;
+
         if (!validateSchoolForm()) return;
+
+        if (!API_URL) {
+            setSchoolError(
+                "The SchoolOS API URL is not configured."
+            );
+            return;
+        }
 
         setCreatingSchool(true);
 
         try {
-            if (!API_URL) {
-                setSchoolError(
-                    "The SchoolOS API URL is not configured."
-                );
-                return;
-            }
-
             const requestData = {
                 school_name: schoolData.schoolName.trim(),
-                school_email: schoolData.schoolEmail.trim(),
+
+                school_email: schoolData.schoolEmail
+                    .trim()
+                    .toLowerCase(),
+
                 creator_role: schoolData.creatorRole,
-                creator_email: schoolData.creatorEmail.trim(),
+
+                creator_email: schoolData.creatorEmail
+                    .trim()
+                    .toLowerCase(),
+
                 creator_phone: schoolData.creatorPhone.trim(),
+
                 estimated_students: Number(
                     schoolData.estimatedStudents
                 ),
-                password: schoolData.password,
-            };
 
-            // Do not log passwords or other sensitive information.
-            console.log("Submitting school account registration.");
+                // School's own password.
+                password: schoolData.password,
+
+                // Separate administrator password.
+                admin_password: schoolData.adminPassword,
+            };
 
             const response = await fetch(
                 `${API_URL}/create_school_account`,
@@ -299,8 +395,6 @@ const SchoolOSShowcase = () => {
 
             const result = await response.json();
 
-            console.log("School account registration status:", response.status);
-
             if (!response.ok) {
                 setSchoolError(
                     result.message ||
@@ -311,12 +405,9 @@ const SchoolOSShowcase = () => {
 
             setSchoolMessage(
                 result.message ||
-                "School account created successfully. You can now log in."
+                "School account created successfully. You can now log in using your school email and school password."
             );
 
-            console.log("School account created successfully.");
-
-            // Clear the registration form after successful creation.
             setSchoolData({
                 schoolName: "",
                 schoolEmail: "",
@@ -326,16 +417,25 @@ const SchoolOSShowcase = () => {
                 estimatedStudents: "",
                 password: "",
                 confirmPassword: "",
+                adminPassword: "",
+                confirmAdminPassword: "",
             });
 
             setShowCreatePassword(false);
             setShowConfirmPassword(false);
+            setShowAdminPassword(false);
+            setShowConfirmAdminPassword(false);
+
         } catch (error) {
-            console.error("Create School Account Error:", error);
+            console.error(
+                "Create School Account Error:",
+                error
+            );
 
             setSchoolError(
                 "Unable to connect to the SchoolOS server."
             );
+
         } finally {
             setCreatingSchool(false);
         }
@@ -348,11 +448,12 @@ const SchoolOSShowcase = () => {
     const openCreateAccount = () => {
         setSchoolMessage("");
         setSchoolError("");
+        setLoginError("");
         setShowCreateAccount(true);
     };
 
     // =====================================================
-    // RETURN TO LOGIN
+    // RETURN TO SCHOOL LOGIN
     // =====================================================
 
     const backToLogin = () => {
@@ -387,8 +488,13 @@ const SchoolOSShowcase = () => {
         navigate("/", { replace: true });
     };
 
+    // =====================================================
+    // PAGE UI
+    // =====================================================
+
     return (
         <div className="showcase-page single-screen-lock">
+
             <div className="split-bg-white"></div>
 
             <div
@@ -409,7 +515,10 @@ const SchoolOSShowcase = () => {
 
             <div className="showcase-blob"></div>
 
+            {/* NAVIGATION */}
+
             <header className="welcome-nav">
+
                 <div
                     className="welcome-brand"
                     onClick={() => navigate("/")}
@@ -433,18 +542,28 @@ const SchoolOSShowcase = () => {
 
                 <button
                     className="nav-login"
+                    type="button"
                     onClick={handleEnterSchoolOS}
                 >
                     Enter SchoolOS
                     <FaArrowRight />
                 </button>
+
             </header>
 
+            {/* MAIN CONTENT */}
+
             <main className="welcome-main">
+
                 <div className="hero-layout-wrapper">
+
+                    {/* LEFT HERO SECTION */}
+
                     <section className="hero-copy">
+
                         <div className="hero-ai-intro">
                             <span className="ai-intro-dot"></span>
+
                             <span>
                                 AI-POWERED SCHOOL & LEARNING PLATFORM
                             </span>
@@ -472,7 +591,9 @@ const SchoolOSShowcase = () => {
                         </p>
 
                         <div className="hero-inclusive">
+
                             <div className="inclusive-content">
+
                                 <span className="inclusive-label">
                                     AI-ASSISTED INCLUSIVE LEARNING
                                 </span>
@@ -484,14 +605,27 @@ const SchoolOSShowcase = () => {
                                     reading support and school content
                                     in ways that work better for them.
                                 </p>
+
                             </div>
+
                         </div>
+
                     </section>
 
+                    {/* LOGIN AND REGISTRATION */}
+
                     <section className="hero-login-panel">
+
                         <div className="glass-login-card">
+
                             {showCreateAccount ? (
+
+                                /* =================================
+                                   SCHOOL REGISTRATION
+                                ================================= */
+
                                 <>
+
                                     <div className="glass-login-avatar">
                                         <div className="avatar-icon-inner"></div>
                                     </div>
@@ -499,11 +633,12 @@ const SchoolOSShowcase = () => {
                                     <h2>Create School Account</h2>
 
                                     <p className="glass-subtitle">
-                                        Set up your school on SchoolOS.
+                                        Set up your school and administrator credentials.
                                     </p>
 
                                     <div className="glass-ai-badge">
                                         <FaRobot className="ai-badge-icon" />
+
                                         <span>
                                             SchoolOS Institutional Setup
                                         </span>
@@ -517,7 +652,10 @@ const SchoolOSShowcase = () => {
                                     )}
 
                                     {schoolError && (
-                                        <div className="school-account-error">
+                                        <div
+                                            className="school-account-error"
+                                            role="alert"
+                                        >
                                             {schoolError}
                                         </div>
                                     )}
@@ -526,8 +664,10 @@ const SchoolOSShowcase = () => {
                                         onSubmit={handleCreateSchoolAccount}
                                         className="glass-form"
                                     >
+
                                         <div className="glass-input-group">
                                             <FaSchool className="input-icon" />
+
                                             <input
                                                 type="text"
                                                 name="schoolName"
@@ -536,11 +676,13 @@ const SchoolOSShowcase = () => {
                                                 value={schoolData.schoolName}
                                                 onChange={handleSchoolInputChange}
                                                 disabled={creatingSchool}
+                                                autoComplete="organization"
                                             />
                                         </div>
 
                                         <div className="glass-input-group">
                                             <FaEnvelope className="input-icon" />
+
                                             <input
                                                 type="email"
                                                 name="schoolEmail"
@@ -549,11 +691,13 @@ const SchoolOSShowcase = () => {
                                                 value={schoolData.schoolEmail}
                                                 onChange={handleSchoolInputChange}
                                                 disabled={creatingSchool}
+                                                autoComplete="off"
                                             />
                                         </div>
 
                                         <div className="glass-input-group">
                                             <FaUserTie className="input-icon" />
+
                                             <select
                                                 name="creatorRole"
                                                 required
@@ -564,61 +708,75 @@ const SchoolOSShowcase = () => {
                                                 <option value="">
                                                     Select Your Role
                                                 </option>
+
                                                 <option value="head-teacher">
                                                     Head Teacher
                                                 </option>
+
                                                 <option value="director">
                                                     Director
                                                 </option>
+
                                                 <option value="administrator">
                                                     School Administrator
                                                 </option>
+
                                                 <option value="proprietor">
                                                     Proprietor / Owner
                                                 </option>
+
                                                 <option value="deputy-head-teacher">
                                                     Deputy Head Teacher
                                                 </option>
+
                                                 <option value="bursar">
                                                     Bursar
                                                 </option>
+
                                                 <option value="teacher">
                                                     Teacher
                                                 </option>
+
                                                 <option value="other">
                                                     Other
                                                 </option>
+
                                             </select>
                                         </div>
 
                                         <div className="glass-input-group">
                                             <FaEnvelope className="input-icon" />
+
                                             <input
                                                 type="email"
                                                 name="creatorEmail"
-                                                placeholder="Your Email Address"
+                                                placeholder="Administrator Email Address"
                                                 required
                                                 value={schoolData.creatorEmail}
                                                 onChange={handleSchoolInputChange}
                                                 disabled={creatingSchool}
+                                                autoComplete="email"
                                             />
                                         </div>
 
                                         <div className="glass-input-group">
                                             <FaPhone className="input-icon" />
+
                                             <input
                                                 type="tel"
                                                 name="creatorPhone"
-                                                placeholder="Your Phone Number"
+                                                placeholder="Administrator Phone Number"
                                                 required
                                                 value={schoolData.creatorPhone}
                                                 onChange={handleSchoolInputChange}
                                                 disabled={creatingSchool}
+                                                autoComplete="tel"
                                             />
                                         </div>
 
                                         <div className="glass-input-group">
                                             <FaUsers className="input-icon" />
+
                                             <input
                                                 type="number"
                                                 name="estimatedStudents"
@@ -632,8 +790,24 @@ const SchoolOSShowcase = () => {
                                             />
                                         </div>
 
+                                        {/* SCHOOL PASSWORD */}
+
+                                        <div className="password-section-heading">
+
+                                            <strong>
+                                                School Account Password
+                                            </strong>
+
+                                            <p>
+                                                This password belongs to the school account.
+                                            </p>
+
+                                        </div>
+
                                         <div className="glass-input-group">
+
                                             <FaLock className="input-icon" />
+
                                             <input
                                                 type={
                                                     showCreatePassword
@@ -641,12 +815,13 @@ const SchoolOSShowcase = () => {
                                                         : "password"
                                                 }
                                                 name="password"
-                                                placeholder="Create Password"
+                                                placeholder="Create School Password"
                                                 required
                                                 minLength="8"
                                                 value={schoolData.password}
                                                 onChange={handleSchoolInputChange}
                                                 disabled={creatingSchool}
+                                                autoComplete="new-password"
                                             />
 
                                             <button
@@ -654,23 +829,26 @@ const SchoolOSShowcase = () => {
                                                 className="password-toggle"
                                                 onClick={() =>
                                                     setShowCreatePassword(
-                                                        !showCreatePassword
+                                                        (prev) => !prev
                                                     )
                                                 }
                                                 aria-label={
                                                     showCreatePassword
-                                                        ? "Hide password"
-                                                        : "Show password"
+                                                        ? "Hide school password"
+                                                        : "Show school password"
                                                 }
                                             >
                                                 {showCreatePassword
                                                     ? <FaEyeSlash />
                                                     : <FaEye />}
                                             </button>
+
                                         </div>
 
                                         <div className="glass-input-group">
+
                                             <FaLock className="input-icon" />
+
                                             <input
                                                 type={
                                                     showConfirmPassword
@@ -678,12 +856,13 @@ const SchoolOSShowcase = () => {
                                                         : "password"
                                                 }
                                                 name="confirmPassword"
-                                                placeholder="Confirm Password"
+                                                placeholder="Confirm School Password"
                                                 required
                                                 minLength="8"
                                                 value={schoolData.confirmPassword}
                                                 onChange={handleSchoolInputChange}
                                                 disabled={creatingSchool}
+                                                autoComplete="new-password"
                                             />
 
                                             <button
@@ -691,24 +870,121 @@ const SchoolOSShowcase = () => {
                                                 className="password-toggle"
                                                 onClick={() =>
                                                     setShowConfirmPassword(
-                                                        !showConfirmPassword
+                                                        (prev) => !prev
                                                     )
                                                 }
                                                 aria-label={
                                                     showConfirmPassword
-                                                        ? "Hide password"
-                                                        : "Show password"
+                                                        ? "Hide confirmation"
+                                                        : "Show confirmation"
                                                 }
                                             >
                                                 {showConfirmPassword
                                                     ? <FaEyeSlash />
                                                     : <FaEye />}
                                             </button>
+
+                                        </div>
+
+                                        {/* ADMINISTRATOR PASSWORD */}
+
+                                        <div className="password-section-heading">
+
+                                            <strong>
+                                                Administrator Login Password
+                                            </strong>
+
+                                            <p>
+                                                Separate credentials for the administrator.
+                                            </p>
+
+                                        </div>
+
+                                        <div className="glass-input-group">
+
+                                            <FaLock className="input-icon" />
+
+                                            <input
+                                                type={
+                                                    showAdminPassword
+                                                        ? "text"
+                                                        : "password"
+                                                }
+                                                name="adminPassword"
+                                                placeholder="Create Admin Password"
+                                                required
+                                                minLength="8"
+                                                value={schoolData.adminPassword}
+                                                onChange={handleSchoolInputChange}
+                                                disabled={creatingSchool}
+                                                autoComplete="new-password"
+                                            />
+
+                                            <button
+                                                type="button"
+                                                className="password-toggle"
+                                                onClick={() =>
+                                                    setShowAdminPassword(
+                                                        (prev) => !prev
+                                                    )
+                                                }
+                                                aria-label={
+                                                    showAdminPassword
+                                                        ? "Hide admin password"
+                                                        : "Show admin password"
+                                                }
+                                            >
+                                                {showAdminPassword
+                                                    ? <FaEyeSlash />
+                                                    : <FaEye />}
+                                            </button>
+
+                                        </div>
+
+                                        <div className="glass-input-group">
+
+                                            <FaLock className="input-icon" />
+
+                                            <input
+                                                type={
+                                                    showConfirmAdminPassword
+                                                        ? "text"
+                                                        : "password"
+                                                }
+                                                name="confirmAdminPassword"
+                                                placeholder="Confirm Admin Password"
+                                                required
+                                                minLength="8"
+                                                value={schoolData.confirmAdminPassword}
+                                                onChange={handleSchoolInputChange}
+                                                disabled={creatingSchool}
+                                                autoComplete="new-password"
+                                            />
+
+                                            <button
+                                                type="button"
+                                                className="password-toggle"
+                                                onClick={() =>
+                                                    setShowConfirmAdminPassword(
+                                                        (prev) => !prev
+                                                    )
+                                                }
+                                                aria-label={
+                                                    showConfirmAdminPassword
+                                                        ? "Hide admin confirmation"
+                                                        : "Show admin confirmation"
+                                                }
+                                            >
+                                                {showConfirmAdminPassword
+                                                    ? <FaEyeSlash />
+                                                    : <FaEye />}
+                                            </button>
+
                                         </div>
 
                                         <div className="password-help-text">
-                                            Password must contain at least
-                                            8 characters.
+                                            Both passwords must contain at least
+                                            8 characters. Keep them different.
                                         </div>
 
                                         <button
@@ -720,8 +996,11 @@ const SchoolOSShowcase = () => {
                                                 ? "Creating School Account..."
                                                 : "Create School Account"}
 
-                                            {!creatingSchool && <FaArrowRight />}
+                                            {!creatingSchool && (
+                                                <FaArrowRight />
+                                            )}
                                         </button>
+
                                     </form>
 
                                     <div className="glass-divider">
@@ -739,9 +1018,17 @@ const SchoolOSShowcase = () => {
                                         Back to School Login
                                         <span>→</span>
                                     </button>
+
                                 </>
+
                             ) : (
+
+                                /* =================================
+                                   SCHOOL ACCOUNT LOGIN
+                                ================================= */
+
                                 <>
+
                                     <div className="glass-login-avatar">
                                         <div className="avatar-icon-inner"></div>
                                     </div>
@@ -749,19 +1036,22 @@ const SchoolOSShowcase = () => {
                                     <h2>School Login</h2>
 
                                     <p className="glass-subtitle">
-                                        Welcome Back! Please login to continue.
+                                        Welcome back! Log in using your school account email and password.
                                     </p>
 
                                     <div className="glass-ai-badge">
                                         <FaRobot className="ai-badge-icon" />
+
                                         <span>
-                                            AI-Powered Operational Management
-                                            System Enabled
+                                            SchoolOS School Account Access
                                         </span>
                                     </div>
 
                                     {loginError && (
-                                        <div className="school-account-error">
+                                        <div
+                                            className="school-account-error"
+                                            role="alert"
+                                        >
                                             {loginError}
                                         </div>
                                     )}
@@ -770,8 +1060,13 @@ const SchoolOSShowcase = () => {
                                         onSubmit={handleLoginSubmit}
                                         className="glass-form"
                                     >
+
+                                        {/* SCHOOL EMAIL */}
+
                                         <div className="glass-input-group">
+
                                             <FaEnvelope className="input-icon" />
+
                                             <input
                                                 type="email"
                                                 name="email"
@@ -780,11 +1075,17 @@ const SchoolOSShowcase = () => {
                                                 value={loginData.email}
                                                 onChange={handleLoginInputChange}
                                                 disabled={loggingIn}
+                                                autoComplete="username"
                                             />
+
                                         </div>
 
+                                        {/* SCHOOL PASSWORD */}
+
                                         <div className="glass-input-group">
+
                                             <FaLock className="input-icon" />
+
                                             <input
                                                 type={
                                                     showPassword
@@ -792,32 +1093,37 @@ const SchoolOSShowcase = () => {
                                                         : "password"
                                                 }
                                                 name="password"
-                                                placeholder="Password"
+                                                placeholder="School Account Password"
                                                 required
                                                 value={loginData.password}
                                                 onChange={handleLoginInputChange}
                                                 disabled={loggingIn}
+                                                autoComplete="current-password"
                                             />
 
                                             <button
                                                 type="button"
                                                 className="password-toggle"
                                                 onClick={() =>
-                                                    setShowPassword(!showPassword)
+                                                    setShowPassword(
+                                                        (prev) => !prev
+                                                    )
                                                 }
                                                 aria-label={
                                                     showPassword
-                                                        ? "Hide password"
-                                                        : "Show password"
+                                                        ? "Hide school password"
+                                                        : "Show school password"
                                                 }
                                             >
                                                 {showPassword
                                                     ? <FaEyeSlash />
                                                     : <FaEye />}
                                             </button>
+
                                         </div>
 
                                         <div className="glass-actions-row">
+
                                             <span
                                                 className="forgot-password-link"
                                                 onClick={() =>
@@ -826,6 +1132,7 @@ const SchoolOSShowcase = () => {
                                             >
                                                 Forgot Password?
                                             </span>
+
                                         </div>
 
                                         <button
@@ -837,12 +1144,17 @@ const SchoolOSShowcase = () => {
                                                 ? "Logging In..."
                                                 : "Enter SchoolOS System"}
 
-                                            {!loggingIn && <FaArrowRight />}
+                                            {!loggingIn && (
+                                                <FaArrowRight />
+                                            )}
                                         </button>
+
                                     </form>
 
                                     <div className="glass-divider">
-                                        <span>Or Registration System</span>
+                                        <span>
+                                            New to SchoolOS?
+                                        </span>
                                     </div>
 
                                     <button
@@ -854,12 +1166,19 @@ const SchoolOSShowcase = () => {
                                         Create School Management Account
                                         <span>→</span>
                                     </button>
+
                                 </>
+
                             )}
+
                         </div>
+
                     </section>
+
                 </div>
+
             </main>
+
         </div>
     );
 };

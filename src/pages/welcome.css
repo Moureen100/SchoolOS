@@ -646,3 +646,33 @@ html, body {
         justify-content: center;
     }
 }
+
+
+.password-section-heading {
+    margin: 12px 0 4px;
+    padding: 12px 14px;
+    border-left: 3px solid #2170a6;
+    border-radius: 8px;
+    background: rgba(33, 112, 166, 0.07);
+}
+
+.password-section-heading strong {
+    display: block;
+    color: #163a30;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.password-section-heading p {
+    margin: 5px 0 0;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.password-help-text {
+    margin: 2px 0 10px;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.5;
+}

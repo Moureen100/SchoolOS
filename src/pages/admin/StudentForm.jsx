@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Layout from "../../Layout";
 import "./StudentForm.css";
@@ -5,15 +6,28 @@ import "./StudentForm.css";
 // =========================================================
 // BACKEND URL
 // =========================================================
+const API_URL = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
 
-const API_URL = import.meta.env.VITE_API_URL;
+// =========================================================
+// GET SCHOOL ACCOUNT AUTH TOKEN
+// =========================================================
+function getAuthToken() {
+    return (
+        sessionStorage.getItem("access_token") ||
+        sessionStorage.getItem("token") ||
+        sessionStorage.getItem("school_access_token") ||
+        sessionStorage.getItem("school_token") ||
+        localStorage.getItem("access_token") ||
+        localStorage.getItem("token") ||
+        localStorage.getItem("school_access_token") ||
+        localStorage.getItem("school_token")
+    );
+}
 
 // =========================================================
 // EMPTY FORM
 // =========================================================
-
 const EMPTY_FORM = {
-    // Student details
     student_name: "",
     middle_name: "",
     last_name: "",
@@ -27,7 +41,6 @@ const EMPTY_FORM = {
     phone_number: "",
     address: "",
 
-    // Guardian details
     guardian_name: "",
     phone: "",
     relationship: "",
@@ -35,10 +48,7 @@ const EMPTY_FORM = {
 
 // =========================================================
 // REQUIRED FIELDS
-// Student ID is NOT here because Flask generates it.
-// Middle name is OPTIONAL.
 // =========================================================
-
 const REQUIRED_FIELDS = [
     ["student_name", "the student's first name"],
     ["last_name", "the student's last name"],
@@ -71,15 +81,26 @@ export default function StudentForm({ onCreated }) {
     const [success, setSuccess] = useState(false);
 
     // =========================================================
-    // GET NEXT STUDENT ID  (GET /students/next-id)
+    // GET NEXT STUDENT ID
     // =========================================================
-
     async function loadNextStudentId() {
         setLoadingStudentId(true);
         setError(null);
 
         try {
-            const res = await fetch(`${API_URL}/students/next-id`);
+            const token = getAuthToken();
+
+            if (!token) {
+                throw new Error("School login token not found. Please log in again.");
+            }
+
+            const res = await fetch(`${API_URL}/students/next-id`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                }
+            });
 
             let data = {};
 
@@ -102,7 +123,6 @@ export default function StudentForm({ onCreated }) {
             }
 
             setNextStudentId(data.student_id);
-
         } catch (err) {
             console.error("Error getting next Student ID:", err);
             setError(err.message);
@@ -115,7 +135,9 @@ export default function StudentForm({ onCreated }) {
         loadNextStudentId();
     }, []);
 
+    // =========================================================
     // PHOTO PREVIEW
+    // =========================================================
     useEffect(() => {
         if (!photoFile) {
             setPhotoPreviewUrl(null);
@@ -123,13 +145,14 @@ export default function StudentForm({ onCreated }) {
         }
 
         const url = URL.createObjectURL(photoFile);
-
         setPhotoPreviewUrl(url);
 
         return () => URL.revokeObjectURL(url);
     }, [photoFile]);
 
+    // =========================================================
     // HANDLE INPUT CHANGES
+    // =========================================================
     function handleChange(e) {
         const { name, value } = e.target;
 
@@ -144,9 +167,11 @@ export default function StudentForm({ onCreated }) {
         }
     }
 
+    // =========================================================
     // HANDLE PHOTO SELECTION
+    // =========================================================
     function handlePhotoChange(e) {
-        const file = e.target.files[0];
+        const file = e.target.files?.[0];
 
         if (!file) {
             setPhotoFile(null);
@@ -156,6 +181,7 @@ export default function StudentForm({ onCreated }) {
         if (!file.type.startsWith("image/")) {
             setError("Please select a valid image file.");
             setPhotoFile(null);
+            e.target.value = "";
             return;
         }
 
@@ -166,7 +192,6 @@ export default function StudentForm({ onCreated }) {
     // =========================================================
     // SUBMIT STUDENT
     // =========================================================
-
     async function handleSubmit(e) {
         e.preventDefault();
 
@@ -175,14 +200,22 @@ export default function StudentForm({ onCreated }) {
         setInvalidField(null);
         setSuccess(false);
 
+        if (!API_URL) {
+            setError("Backend URL is not configured. Check your VITE_API_URL.");
+            setSubmitting(false);
+            return;
+        }
+
         if (!nextStudentId) {
-            setError("Student ID is not ready yet. Please wait a moment and try again.");
+            setError(
+                "Student ID is not ready yet. Please wait a moment and try again."
+            );
             setSubmitting(false);
             return;
         }
 
         for (const [name, label] of REQUIRED_FIELDS) {
-            if (!form[name].trim()) {
+            if (!String(form[name] || "").trim()) {
                 setError(`Please enter ${label}.`);
                 setInvalidField(name);
                 setSubmitting(false);
@@ -190,7 +223,13 @@ export default function StudentForm({ onCreated }) {
             }
         }
 
-        // first + middle + last  ->  "Kevin Aaron Rose"
+        if (!form.gender) {
+            setError("Please select the student's gender.");
+            setInvalidField("gender");
+            setSubmitting(false);
+            return;
+        }
+
         const studentName = [
             form.student_name.trim(),
             form.middle_name.trim(),
@@ -206,10 +245,19 @@ export default function StudentForm({ onCreated }) {
         }
 
         try {
-            // student_id is intentionally NOT sent - Flask generates it
+            // Retrieve the token saved by the school login.
+            const token = getAuthToken();
+
+            if (!token) {
+                throw new Error(
+                    "Your school login token was not found. Please log out and log in again. If the problem continues, check which storage key your login uses for access_token."
+                );
+            }
+
+            // Flask generates student_id automatically.
+            // The school_id is obtained from the verified JWT on the backend.
             const studentData = {
                 student_name: studentName,
-
                 student_class: form.student_class,
                 stream: form.stream,
                 date_of_birth: form.date_of_birth || null,
@@ -227,11 +275,13 @@ export default function StudentForm({ onCreated }) {
             };
 
             console.log("Student ID currently displayed:", nextStudentId);
-            console.log("Student data being sent:", studentData);
 
             const res = await fetch(`${API_URL}/students`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
                 body: JSON.stringify(studentData),
             });
 
@@ -244,6 +294,13 @@ export default function StudentForm({ onCreated }) {
             }
 
             if (!res.ok) {
+                if (res.status === 401) {
+                    throw new Error(
+                        data.message ||
+                        "Authentication failed. Your school token may be expired, invalid, or stored under a different key. Log in again and retry."
+                    );
+                }
+
                 throw new Error(
                     data.message ||
                     data.error ||
@@ -266,12 +323,11 @@ export default function StudentForm({ onCreated }) {
                 photoInput.value = "";
             }
 
-            // e.g. ST005 -> ST006
+            // Refresh the displayed student ID.
             await loadNextStudentId();
-
         } catch (err) {
             console.error("Error creating student:", err);
-            setError(err.message);
+            setError(err.message || "An unexpected error occurred.");
         } finally {
             setSubmitting(false);
         }
@@ -280,12 +336,9 @@ export default function StudentForm({ onCreated }) {
     // =========================================================
     // UI
     // =========================================================
-
     return (
         <Layout role="admin">
             <div className="sf-page">
-
-                {/* ---------- HEADER BANNER ---------- */}
                 <header className="sf-page-header">
                     <div className="sf-header-text">
                         <h1 className="sf-title">Add Student</h1>
@@ -297,19 +350,21 @@ export default function StudentForm({ onCreated }) {
                     <div className="sf-id-box">
                         <span className="sf-id-label">Student ID</span>
                         <div className="sf-id-value">
-                            {loadingStudentId ? "Generating..." : nextStudentId}
+                            {loadingStudentId
+                                ? "Generating..."
+                                : nextStudentId || "Unavailable"}
                         </div>
                     </div>
                 </header>
 
                 <form onSubmit={handleSubmit} noValidate>
-
                     <div className="sf-form-grid">
-
-                        {/* ---------- STUDENT DETAILS (blue) ---------- */}
+                        {/* STUDENT DETAILS */}
                         <section className="sf-card">
                             <h2 className="sf-legend">Student details</h2>
-                            <p className="sf-hint">Name, class and background</p>
+                            <p className="sf-hint">
+                                Name, class and background
+                            </p>
 
                             <div className="sf-field-row">
                                 <Field
@@ -382,26 +437,34 @@ export default function StudentForm({ onCreated }) {
                                     onChange={handleChange}
                                     as="select"
                                     options={["", "male", "female"]}
+                                    invalid={invalidField === "gender"}
                                 />
                             </div>
                         </section>
 
-                        {/* ---------- PHOTO + CONTACT (green) ---------- */}
+                        {/* PHOTO AND CONTACT */}
                         <section className="sf-card sf-card--green">
                             <h2 className="sf-legend">Photo and contact</h2>
-                            <p className="sf-hint">How to recognise and reach the student</p>
+                            <p className="sf-hint">
+                                How to recognise and reach the student
+                            </p>
 
                             <div className="sf-photo-row">
                                 <div className="sf-photo-slot">
                                     {photoPreviewUrl ? (
-                                        <img src={photoPreviewUrl} alt="Selected student" />
+                                        <img
+                                            src={photoPreviewUrl}
+                                            alt="Selected student"
+                                        />
                                     ) : (
                                         "Photo"
                                     )}
                                 </div>
 
                                 <div className="sf-photo-controls">
-                                    <span className="sf-field-label">Student photo</span>
+                                    <span className="sf-field-label">
+                                        Student photo
+                                    </span>
 
                                     <input
                                         id="student-photo"
@@ -418,8 +481,9 @@ export default function StudentForm({ onCreated }) {
                                     )}
 
                                     <span className="sf-photo-hint">
-                                        Photo upload is selected for now.
-                                        It will be connected to the backend later.
+                                        Photo preview is available. Uploading
+                                        the actual image to the backend is not
+                                        implemented yet.
                                     </span>
                                 </div>
                             </div>
@@ -454,10 +518,12 @@ export default function StudentForm({ onCreated }) {
                             />
                         </section>
 
-                        {/* ---------- GUARDIAN (yellow, full width) ---------- */}
+                        {/* GUARDIAN DETAILS */}
                         <section className="sf-card sf-card--yellow sf-card--wide">
                             <h2 className="sf-legend">Guardian details</h2>
-                            <p className="sf-hint">Who we contact about this student</p>
+                            <p className="sf-hint">
+                                Who we contact about this student
+                            </p>
 
                             <div className="sf-field-row sf-field-row--three">
                                 <Field
@@ -480,7 +546,13 @@ export default function StudentForm({ onCreated }) {
                                     value={form.relationship}
                                     onChange={handleChange}
                                     as="select"
-                                    options={["", "parent", "sibling", "relative", "guardian"]}
+                                    options={[
+                                        "",
+                                        "parent",
+                                        "sibling",
+                                        "relative",
+                                        "guardian",
+                                    ]}
                                     invalid={invalidField === "relationship"}
                                 />
                             </div>
@@ -488,12 +560,15 @@ export default function StudentForm({ onCreated }) {
                             <button
                                 type="submit"
                                 className="sf-submit"
-                                disabled={submitting || loadingStudentId || !nextStudentId}
+                                disabled={
+                                    submitting ||
+                                    loadingStudentId ||
+                                    !nextStudentId
+                                }
                             >
                                 {submitting ? "Saving..." : "Save student"}
                             </button>
                         </section>
-
                     </div>
 
                     {error && (
@@ -507,12 +582,14 @@ export default function StudentForm({ onCreated }) {
                     )}
 
                     {success && (
-                        <p className="sf-message sf-message--success" role="status">
+                        <p
+                            className="sf-message sf-message--success"
+                            role="status"
+                        >
                             Student saved successfully.{" "}
                             <a href="/admin/students">View students</a>
                         </p>
                     )}
-
                 </form>
             </div>
         </Layout>
@@ -520,9 +597,8 @@ export default function StudentForm({ onCreated }) {
 }
 
 // =========================================================
-// FIELD
+// REUSABLE FIELD
 // =========================================================
-
 function Field({
                    label,
                    name,
@@ -531,16 +607,18 @@ function Field({
                    type = "text",
                    placeholder,
                    as,
-                   options,
+                   options = [],
                    invalid,
                }) {
-    const fieldClass = ["sf-field", invalid ? "sf-field--invalid" : ""]
+    const fieldClass = [
+        "sf-field",
+        invalid ? "sf-field--invalid" : "",
+    ]
         .filter(Boolean)
         .join(" ");
 
     return (
         <label className={fieldClass} htmlFor={name}>
-
             <span className="sf-field-label">{label}</span>
 
             {as === "select" ? (
@@ -570,7 +648,6 @@ function Field({
                     aria-invalid={invalid || undefined}
                 />
             )}
-
         </label>
     );
 }

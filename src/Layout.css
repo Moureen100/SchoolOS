@@ -587,3 +587,9 @@ body {
         height: 150px;
     }
 }
+
+
+.layout-container .studio { min-height: 0; background: transparent; }
+.layout-container .studio .topbar { position: static; border-radius: 12px; margin-bottom: 12px; }
+.layout-container .studio .brief { position: static; height: auto; }
+.layout-container .studio .editor { height: calc(100vh - 200px); min-height: 560px; }

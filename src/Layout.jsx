@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import {
@@ -16,6 +17,7 @@ import {
     FaGraduationCap,
     FaCog,
     FaBullhorn,
+    FaMagic, // NEW: icon for AI Creative Studio
 } from "react-icons/fa";
 
 import "./Layout.css";
@@ -64,6 +66,8 @@ const ROLE_LINKS = {
             { to: "/admin/feeset", label: "Fee Set", icon: <FaMoneyBillWave /> },
             { to: "/admin/academics", label: "Academic Oversight", icon: <FaGraduationCap /> },
             { to: "/admin/communication", label: "Communication", icon: <FaBullhorn /> },
+            // NEW: AI Creative Studio tab (posters, flyers, banners)
+            { to: "/admin/ai-studio", label: "AI Creative Studio", icon: <FaMagic /> },
             { to: "/admin/configuration", label: "System Configuration", icon: <FaCog /> },
         ],
     },
@@ -111,6 +115,21 @@ const ROLE_LINKS = {
 };
 
 // =====================================================
+// HELPER: READ THE LOGGED-IN USER FROM LOCAL STORAGE
+// =====================================================
+
+function getStoredUser() {
+    try {
+        const savedUser = localStorage.getItem("user");
+
+        return savedUser ? JSON.parse(savedUser) : null;
+    } catch (error) {
+        console.error("Could not read the saved user:", error);
+        return null;
+    }
+}
+
+// =====================================================
 // LAYOUT COMPONENT
 // =====================================================
 
@@ -118,7 +137,22 @@ export default function Layout({ role: propRole, children }) {
     const location = useLocation();
     const navigate = useNavigate();
 
+    // =================================================
+    // LOGGED-IN USER
+    // =================================================
+
+    const [currentUser, setCurrentUser] = useState(getStoredUser);
+
+    // Refresh the user when navigating between pages.
+    // This picks up the user saved during login.
+    useEffect(() => {
+        setCurrentUser(getStoredUser());
+    }, [location.pathname]);
+
+    // =================================================
     // AUTO-DETECT ROLE FROM URL
+    // =================================================
+
     const path = location.pathname;
 
     const inferredRole =
@@ -129,21 +163,61 @@ export default function Layout({ role: propRole, children }) {
         (path.startsWith("/parent") && "parent") ||
         (path.startsWith("/bursar") && "bursar");
 
+    // =================================================
     // ROLE CONFIGURATION
+    // =================================================
+
     const config =
         ROLE_LINKS[inferredRole] || {
             label: "Unknown Role",
             links: [],
         };
 
+    // =================================================
     // LOGIN PAGE FOR CURRENT ROLE
+    // =================================================
+
     const loginPath = `/login/${LOGIN_KEYS[inferredRole] || inferredRole}`;
+
+    // =================================================
+    // DISPLAY USER NAME AND AVATAR
+    // =================================================
+
+    const displayName =
+        currentUser?.firstName ||
+        currentUser?.first_name ||
+        currentUser?.name ||
+        currentUser?.username ||
+        "You";
+
+    const avatarInitial = displayName.charAt(0).toUpperCase();
+
+    // Display a readable role name instead of camelCase.
+    const displayRole =
+        inferredRole === "classTeacher"
+            ? "Class Teacher"
+            : inferredRole === "teacher"
+                ? "Teacher"
+                : inferredRole === "admin"
+                    ? "Admin"
+                    : inferredRole === "parent"
+                        ? "Parent"
+                        : inferredRole === "bursar"
+                            ? "Bursar"
+                            : "Guest";
+
+    // =================================================
+    // RENDER LAYOUT
+    // =================================================
 
     return (
         <div className="layout-container">
             {/* ================= SIDEBAR ================= */}
+
             <aside className="sidebar">
-                <div className="sidebar-header">{config.label}</div>
+                <div className="sidebar-header">
+                    {config.label}
+                </div>
 
                 <nav className="sidebar-links">
                     {config.links.map((link) => {
@@ -155,34 +229,55 @@ export default function Layout({ role: propRole, children }) {
                                 to={link.to}
                                 className={`sidebar-link ${active ? "active" : ""}`}
                             >
-                                <span className="icon">{link.icon}</span>
+                                <span className="icon">
+                                    {link.icon}
+                                </span>
+
                                 <span>{link.label}</span>
                             </Link>
                         );
                     })}
                 </nav>
 
+                {/* ================= SIDEBAR FOOTER ================= */}
+
                 <div className="sidebar-footer">
-                    <Link to={ROLE_SELECT_PATH} className="switch-role">
+                    <Link
+                        to={ROLE_SELECT_PATH}
+                        className="switch-role"
+                    >
                         ← Switch role
                     </Link>
+
+                    {/* ================= USER PROFILE ================= */}
 
                     <div
                         className="profile-section"
                         onClick={() => navigate(loginPath)}
+                        title="Open login page"
                     >
-                        <div className="avatar">S</div>
+                        <div className="avatar">
+                            {avatarInitial}
+                        </div>
 
                         <div className="profile-info">
-                            <div className="name">You</div>
-                            <div className="role">{inferredRole || "Guest"}</div>
+                            <div className="name">
+                                {displayName}
+                            </div>
+
+                            <div className="role">
+                                {displayRole}
+                            </div>
                         </div>
                     </div>
                 </div>
             </aside>
 
             {/* ================= MAIN CONTENT ================= */}
+
             <main className="main-content">
+                {/* ================= TOP NAVBAR ================= */}
+
                 <header className="top-navbar">
                     <input
                         type="text"
@@ -191,13 +286,19 @@ export default function Layout({ role: propRole, children }) {
                     />
 
                     <div className="user-actions">
-                        <button className="notif-btn" type="button">
+                        <button
+                            className="notif-btn"
+                            type="button"
+                            aria-label="Notifications"
+                        >
                             🔔
                         </button>
 
                         <button
                             className="logout-btn"
                             type="button"
+                            aria-label="Go to login"
+                            title="Go to login"
                             onClick={() => navigate(loginPath)}
                         >
                             ⏻
@@ -205,7 +306,11 @@ export default function Layout({ role: propRole, children }) {
                     </div>
                 </header>
 
-                <div className="page-content">{children}</div>
+                {/* ================= PAGE CONTENT ================= */}
+
+                <div className="page-content">
+                    {children}
+                </div>
             </main>
         </div>
     );

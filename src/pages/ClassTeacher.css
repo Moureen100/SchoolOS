@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap");
+
 /* =========================================================
    SCHOOL OS - CLASS TEACHER / REPORT COMPILATION
    Same design as the Add Teacher + Fee pages:
@@ -1718,5 +1720,964 @@
     .marks-table-wrapper {
         max-height: none;
         overflow: visible;
+    }
+}
+
+
+/* =========================================================
+   27. CLICKABLE STUDENT + REPORT BUTTON
+   ========================================================= */
+
+.student-open {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.student-open:hover strong {
+    color: var(--blue);
+    text-decoration: underline;
+}
+
+.report-cell {
+    min-width: 110px;
+}
+
+.view-report-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 10px;
+    background: var(--navy);
+    color: #ffffff;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.view-report-btn svg {
+    width: 13px;
+    height: 13px;
+    color: var(--yellow);
+}
+
+.view-report-btn:hover {
+    background: var(--blue);
+}
+
+@media print {
+    .report-cell {
+        display: none !important;
+    }
+}
+
+
+/* =========================================================
+   28. REPORT CARD (same A4 design as the parent Results page)
+   Popup preview + print / save as PDF
+   ========================================================= */
+
+.rc-overlay,
+.report-sheet {
+    --c-primary: #151b52;
+    --c-text-secondary: #6f7a95;
+    --c-surface: #ffffff;
+    --c-border: #e4e8f4;
+    --c-background: #f5f7fd;
+}
+
+/* ---------- popup ---------- */
+
+.rc-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(15, 21, 56, 0.72);
+    backdrop-filter: blur(3px);
+    animation: rc-fade 0.18s ease both;
+}
+
+.rc-overlay *,
+.rc-overlay *::before,
+.rc-overlay *::after,
+.report-sheet *,
+.report-sheet *::before,
+.report-sheet *::after {
+    box-sizing: border-box;
+}
+
+@keyframes rc-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes rc-pop {
+    from { opacity: 0; transform: translateY(12px) scale(0.98); }
+    to { opacity: 1; transform: none; }
+}
+
+.rc-dialog {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 880px;
+    max-height: 100%;
+    border-radius: 18px;
+    background: #e9ecf6;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+    animation: rc-pop 0.22s ease both;
+}
+
+.rc-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #151b52;
+    color: #ffffff;
+    font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+}
+
+.rc-toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rc-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    height: 38px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 10px;
+    font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.rc-btn svg {
+    width: 15px;
+    height: 15px;
+}
+
+.rc-btn-primary {
+    background: #fbc94a;
+    color: #0f1538;
+}
+
+.rc-btn-primary:hover {
+    background: #efb72a;
+}
+
+.rc-btn-icon {
+    width: 38px;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+}
+
+.rc-btn-icon:hover {
+    background: rgba(255, 255, 255, 0.26);
+}
+
+.rc-btn:focus-visible {
+    outline: 3px solid #ffffff;
+    outline-offset: 2px;
+}
+
+.rc-scroll {
+    overflow: auto;
+    padding: 22px 18px 26px;
+}
+
+/* ================================================================== */
+/*  REPORT CARD PAPER (copied from the parent Results page)            */
+/* ================================================================== */
+
+.rc-page {
+    width: 210mm;
+    min-height: 297mm;
+    box-sizing: border-box;
+    margin: 0 auto;
+    padding: 9mm;
+    background: #fff;
+    color: #1f2937;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 12px;
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.18);
+}
+
+/* Double-line certificate style border */
+.rc-frame {
+    position: relative;
+    box-sizing: border-box;
+    min-height: calc(297mm - 18mm);
+    padding: 8mm 8mm 6mm;
+    border: 2px solid var(--c-primary);
+    outline: 1px solid var(--c-primary);
+    outline-offset: -6px;
+    overflow: hidden;
+}
+
+.rc-watermark {
+    position: absolute; left: 50%; top: 52%;
+    transform: translate(-50%, -50%);
+    font-size: 380px; font-weight: 700; line-height: 1;
+    color: var(--c-primary); opacity: 0.045;
+    pointer-events: none; user-select: none;
+}
+
+.rc-frame > *:not(.rc-watermark) { position: relative; }
+
+/* Header */
+.rc-head { display: flex; align-items: center; gap: 14px; padding-bottom: 10px; border-bottom: 3px double var(--c-primary); }
+
+.rc-crest {
+    width: 66px; height: 66px; border-radius: 50%; flex: none;
+    background: var(--c-primary); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; font-weight: 700; border: 3px solid #fff; box-shadow: 0 0 0 2px var(--c-primary);
+}
+
+.rc-school { flex: 1; text-align: center; }
+.rc-school h1 { margin: 0; font-size: 24px; letter-spacing: 0.5px; color: var(--c-primary); }
+.rc-motto { margin: 2px 0; font-style: italic; font-size: 13px; }
+.rc-contact { margin: 0; font-size: 10.5px; color: var(--c-text-secondary); }
+
+.rc-photo {
+    width: 70px; height: 84px; flex: none; border: 1px solid var(--c-primary);
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    font-size: 9px; color: var(--c-text-secondary); background: #fafafa; overflow: hidden;
+}
+
+.rc-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+.rc-banner {
+    margin: 10px 0; padding: 6px 10px; text-align: center;
+    background: var(--c-primary); color: #fff;
+    font-size: 14px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+}
+
+/* Pupil details with fill-in-the-blank lines */
+.rc-bio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 14px; margin-bottom: 12px; }
+.rc-field { display: flex; align-items: baseline; gap: 6px; border-bottom: 1px dotted #6b7280; padding-bottom: 2px; min-width: 0; min-height: 20px; }
+.rc-field-wide { grid-column: span 3; }
+.rc-field-label { font-size: 10.5px; color: var(--c-text-secondary); white-space: nowrap; }
+.rc-field-value { font-weight: 700; font-size: 12.5px; }
+
+/* Marks table */
+.rc-marks { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+.rc-marks th, .rc-marks td { border: 1px solid #9ca3af; padding: 6px 8px; text-align: center; }
+.rc-marks th { background: var(--c-primary); color: #fff; font-size: 11px; line-height: 1.2; border-color: var(--c-primary); }
+.rc-marks th small { display: block; font-weight: 400; font-size: 9.5px; opacity: 0.9; }
+.rc-marks tbody tr:nth-child(even) { background: rgba(0, 0, 0, 0.03); }
+.rc-marks .rc-left { text-align: left; }
+.rc-subject { font-weight: 700; }
+.rc-total { font-weight: 700; }
+.rc-remark { font-style: italic; }
+.rc-marks tfoot td { background: var(--c-background); font-weight: 700; border-top: 2px solid var(--c-primary); }
+
+.rc-grade { display: inline-block; min-width: 24px; padding: 1px 6px; border-radius: 3px; font-weight: 700; }
+.rc-grade-A { background: #dcfce7; color: #166534; }
+.rc-grade-B { background: #dbeafe; color: #1e40af; }
+.rc-grade-C { background: #fef9c3; color: #854d0e; }
+.rc-grade-D { background: #ffedd5; color: #9a3412; }
+.rc-grade-E { background: #fee2e2; color: #991b1b; }
+
+/* Key + conduct boxes */
+.rc-row { display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; margin-bottom: 12px; }
+.rc-box { border: 1px solid #9ca3af; padding: 8px 10px; }
+.rc-box h3, .rc-comment h3 { margin: 0 0 4px; font-size: 11.5px; color: var(--c-primary); text-transform: uppercase; letter-spacing: 0.6px; }
+.rc-key-line { display: grid; grid-template-columns: 62px 78px 1fr; font-size: 11px; padding: 1px 0; }
+.rc-key-line em { color: var(--c-text-secondary); }
+.rc-conduct { margin: 0 0 6px; font-weight: 700; font-size: 12.5px; min-height: 18px; }
+.rc-conduct.rc-blank { border-bottom: 1px dotted #6b7280; }
+
+/* Comments with signature lines */
+.rc-comment { position: relative; border: 1px solid #9ca3af; padding: 8px 10px 10px; margin-bottom: 10px; min-height: 62px; }
+.rc-comment p { margin: 2px 0 14px; font-style: italic; line-height: 1.5; font-size: 12.5px; min-height: 20px; }
+
+/* Print-only sheet is never visible on screen */
+.report-sheet { display: none; }
+
+@media (max-width: 640px) {
+    .rc-overlay { padding: 0; }
+
+    .rc-dialog {
+        max-width: none;
+        height: 100%;
+        border-radius: 0;
+    }
+
+    .rc-scroll { padding: 12px 8px 20px; }
+}
+
+/* ================================================================== */
+/*  PRINT / SAVE AS PDF (only while a report card is printing)         */
+/*  The @page size is added by the JSX at print time.                  */
+/* ================================================================== */
+
+@media print {
+    /* hide the whole app, show only the report sheet added to <body> */
+    body.rc-printing > *:not(.report-sheet) { display: none !important; }
+    body.rc-printing .report-sheet { display: block; }
+
+    body.rc-printing {
+        background: #fff !important;
+        margin: 0;
+        overflow: visible !important;
+    }
+
+    .report-sheet,
+    .report-sheet * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .report-sheet .rc-page {
+        box-shadow: none;
+        margin: 0;
+        width: 210mm;
+        height: 297mm;
+        min-height: 0;
+        overflow: hidden;
+        break-after: auto;
+        page-break-after: auto;
+    }
+
+    .report-sheet .rc-frame {
+        min-height: 0;
+        height: calc(297mm - 18mm);
+    }
+}
+
+
+/* =========================================================
+   29. EDITABLE REMARKS + PASSPORT PHOTO
+   (edit controls only exist on screen, never on the print sheet)
+   ========================================================= */
+
+/* toolbar extras */
+
+.rc-toolbar-title {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.rc-toolbar-title small {
+    color: #b9c4f5;
+    font-size: 11px;
+}
+
+.rc-notice {
+    padding: 8px 16px;
+    background: #fde8e9;
+    color: #8f1a1e;
+    font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* editable fields look like pencil-in areas on the paper */
+
+.rc-edit {
+    display: block;
+    width: 100%;
+    margin: 0 0 6px;
+    padding: 5px 8px;
+    border: 1px dashed #1a6ce0;
+    border-radius: 4px;
+    background: #f3f8ff;
+    color: #1f2937;
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 700;
+    outline: none;
+}
+
+.rc-edit:focus {
+    background: #ffffff;
+    border-style: solid;
+    box-shadow: 0 0 0 3px rgba(26, 108, 224, 0.16);
+}
+
+.rc-edit-area {
+    min-height: 54px;
+    margin: 2px 0 14px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.5;
+    resize: vertical;
+}
+
+/* passport photo: add / change / remove (screen only) */
+
+.rc-photo {
+    position: relative;
+}
+
+.rc-photo-edit {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 4px 0;
+    background: rgba(21, 27, 82, 0.86);
+    color: #ffffff;
+    font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.rc-photo-edit svg {
+    width: 11px;
+    height: 11px;
+}
+
+.rc-photo-edit input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.rc-photo-remove {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(224, 40, 46, 0.92);
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.rc-photo-remove svg {
+    width: 11px;
+    height: 11px;
+}
+
+@media (max-width: 640px) {
+    .rc-toolbar {
+        flex-wrap: wrap;
+    }
+}
+
+
+/* =========================================================
+   30. SIGNATURE ON THE REPORT CARD (handwritten look)
+   ========================================================= */
+
+.rc-signblock {
+    margin-top: 2px;
+}
+
+.rc-edit-name {
+    max-width: 280px;
+    margin: 2px 0 8px;
+    font-weight: 400;
+}
+
+.rc-sign {
+    width: 270px;
+    max-width: 100%;
+}
+
+.rc-sign-line {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 38px;
+    border-bottom: 1px solid #111;
+}
+
+.rc-signature {
+    padding: 0 6px 2px;
+    color: #1a2a8c;
+    font-family: "Dancing Script", "Brush Script MT", "Segoe Script", "Lucida Handwriting", cursive;
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    transform: rotate(-3deg);
+    transform-origin: left bottom;
+}
+
+.rc-sign-date {
+    padding-bottom: 3px;
+    color: var(--c-text-secondary);
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+.rc-sign small {
+    display: block;
+    margin-top: 3px;
+    color: var(--c-text-secondary);
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   31. NEW: "USE SUGGESTED" BUTTON (report card, screen only)
+   Shows after the teacher changes a system remark.
+   ========================================================= */
+
+.rc-reset {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 10px;
+    padding: 2px 9px;
+    border: 1px solid #c3cbe3;
+    border-radius: 999px;
+    background: #ffffff;
+    color: #151b52;
+    font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
+    vertical-align: middle;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.rc-reset svg {
+    width: 11px;
+    height: 11px;
+    color: #1a6ce0;
+}
+
+.rc-reset:hover {
+    background: #e6eefc;
+    border-color: #1a6ce0;
+}
+
+
+/* =========================================================
+   32. NEW: SIGNATURES SECTION (sign once, on the page)
+   Same look as the other cards: white rounded card with a
+   coloured top bar, field-grey inner cards, yellow button.
+   ========================================================= */
+
+.sign-setup {
+    padding: 28px 22px 22px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    background:
+            linear-gradient(var(--navy), var(--navy)) top / 100% 6px no-repeat,
+            #ffffff;
+    animation: ct-rise 0.35s ease both;
+}
+
+.sign-setup-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 0 0 18px;
+    padding: 12px 16px;
+    border-left: 5px solid var(--yellow);
+    border-radius: 12px;
+    background: var(--yellow-soft);
+    color: #6b5200;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.6;
+}
+
+.sign-setup-error {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0 0 14px;
+    padding: 10px 14px;
+    border-left: 5px solid var(--red);
+    border-radius: 12px;
+    background: var(--red-soft);
+    color: #8f1a1e;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.sign-setup-error svg {
+    width: 14px;
+    height: 14px;
+}
+
+.sign-setup-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 18px;
+}
+
+.sign-setup-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--field);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sign-setup-card:focus-within {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 4px rgba(26, 108, 224, 0.12);
+}
+
+.sign-setup-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.sign-setup-top strong {
+    display: block;
+    color: var(--ink);
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.sign-setup-top small {
+    display: block;
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Signed / Not signed badge */
+
+.sign-setup-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: var(--yellow-soft);
+    color: #8a6200;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.sign-setup-badge svg {
+    width: 11px;
+    height: 11px;
+}
+
+.sign-setup-badge.is-signed {
+    background: var(--green-soft);
+    color: #1d7d21;
+}
+
+/* name input */
+
+.sign-setup-input {
+    width: 100%;
+    height: 44px;
+    padding: 0 14px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: #ffffff;
+    color: var(--ink);
+    font: inherit;
+    font-size: 14px;
+    outline: none;
+    box-shadow: inset 0 0 0 1px var(--line);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sign-setup-input::placeholder {
+    color: var(--muted-light);
+}
+
+.sign-setup-input:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 4px rgba(26, 108, 224, 0.14);
+}
+
+.sign-setup-input:disabled {
+    background: var(--line);
+    cursor: not-allowed;
+}
+
+/* handwritten preview, like a signature line on paper */
+
+.sign-setup-preview {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 14px;
+    min-height: 84px;
+    padding: 12px 16px 10px;
+    border: 1px dashed #c3cbe3;
+    border-radius: 12px;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+/* the line the signature sits on */
+.sign-setup-preview::after {
+    content: "";
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 28px;
+    border-bottom: 1px solid #111111;
+    pointer-events: none;
+}
+
+.sign-setup-preview .rc-signature {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 6px;
+    max-width: 70%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sign-setup-preview .rc-sign-date {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 4px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.sign-setup-empty {
+    align-self: center;
+    margin: 0 auto;
+    color: var(--muted-light);
+    font-size: 13px;
+    font-style: italic;
+}
+
+/* buttons */
+
+.sign-setup-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sign-setup-save {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex: 1;
+    height: 44px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 12px;
+    background: var(--yellow);
+    color: var(--navy-deep);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.sign-setup-save svg {
+    width: 15px;
+    height: 15px;
+}
+
+.sign-setup-save:hover:not(:disabled) {
+    background: var(--yellow-dark);
+    transform: translateY(-1px);
+}
+
+.sign-setup-save:disabled {
+    background: var(--line);
+    color: var(--muted-light);
+    cursor: not-allowed;
+}
+
+.sign-setup-clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 44px;
+    padding: 0 18px;
+    border: none;
+    border-radius: 12px;
+    background: var(--red-soft);
+    color: var(--red);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sign-setup-clear svg {
+    width: 14px;
+    height: 14px;
+}
+
+.sign-setup-clear:hover:not(:disabled) {
+    background: var(--red);
+    color: #ffffff;
+}
+
+.sign-setup-clear:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (max-width: 800px) {
+    .sign-setup {
+        padding: 24px 14px 16px;
+    }
+
+    .sign-setup-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .sign-setup-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .sign-setup-top {
+        flex-direction: column;
+    }
+}
+
+@media print {
+    .sign-setup {
+        display: none !important;
+    }
+}
+
+
+/* =========================================================
+   33. NEW: NEXT TERM BEGINS (set once, on every report)
+   Sits in the same card as the signatures, full width.
+   ========================================================= */
+
+.sign-setup-card.is-wide {
+    grid-column: 1 / -1;
+}
+
+.term-setup-body {
+    display: grid;
+    grid-template-columns: minmax(220px, 320px) 1fr;
+    gap: 14px;
+    align-items: stretch;
+}
+
+.sign-setup-input[type="date"] {
+    min-width: 0;
+    cursor: pointer;
+}
+
+/* how the date will read on the report card */
+
+.term-setup-preview {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 84px;
+    padding: 12px 16px;
+    border: 1px dashed #c3cbe3;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.term-setup-preview-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 36px;
+    flex: 0 0 40px;
+    clip-path: var(--hex);
+    background: var(--yellow);
+    color: var(--navy-deep);
+}
+
+.term-setup-preview-icon svg {
+    width: 15px;
+    height: 15px;
+}
+
+.term-setup-preview small {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.term-setup-preview strong {
+    display: block;
+    margin-top: 2px;
+    color: var(--ink);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.term-setup-preview.is-empty strong {
+    color: var(--muted-light);
+    font-size: 13px;
+    font-style: italic;
+    font-weight: 500;
+}
+
+@media (max-width: 800px) {
+    .term-setup-body {
+        grid-template-columns: 1fr;
     }
 }
