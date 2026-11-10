@@ -26,7 +26,7 @@ export const AUTH_CONFIG = {
   parent: {
     label: "Parent",
     dashboard: "/parent",
-    allowSignup: true,
+    allowSignup: false,
     singleAccount: false,
   },
 

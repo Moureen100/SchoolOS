@@ -18,7 +18,10 @@ import "./PaymentStatus.css";
    marked spots with real fetch calls when the backend is live.
 ========================================================= */
 
-const CHILD = { student_id: "s1", student_name: "Amina Nakato", class_name: "P.2", term: "Term 3, 2026" };
+//  NEW CODE:
+const savedStudents = JSON.parse(localStorage.getItem("parent_students") || "[]");
+const CHILD = savedStudents || { student_id: "ST001", student_name: "Nassanga Moureen", class_name: "P1", term: "Term 3, 2026" };
+
 
 const DUMMY_RECORD = {
   total_fees: 1200000,
@@ -95,12 +98,50 @@ export default function PaymentStatus() {
   const [copied, setCopied] = useState("");
   const [checking, setChecking] = useState(false);
 
-  useEffect(() => {
+  //useEffect(() => {
     // ---- Ready to enable once the backend is live. ----
     // fetch("http://localhost:5000/api/payments/status")
     //   .then((res) => res.json())
     //   .then((data) => setRecord(data));
-  }, []);
+  //}, []);
+ //ENABLED NOW
+  useEffect(() => {
+    const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
+    const token = localStorage.getItem("parent_token");
+
+    // Only attempt sync if a student is loaded into memory
+    if (token && CHILD?.student_id) {
+      fetch(`${API_URL}/api/parent/fees/${CHILD.student_id}?year=2026&term=Term 3`, {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      })
+      .then((res) => {
+        if (!res.ok) throw new Error("Ledger fetch issue");
+        return res.json();
+      })
+      .then((data) => {
+        // When your API returns your SQLite query rows array:
+        if (Array.isArray(data)) {
+          setRecord(prev => ({
+            ...prev,
+            // Re-map backend table records dynamically into your frontend tracking ledger
+            payments: data.map((p, idx) => ({
+              id: p.id || `db-p-${idx}`,
+              date: p.date ? String(p.date).split("T")[0] : todayIso(),
+              amount: p.amount || 0,
+              method: p.method || "Mobile Money",
+              reference: p.purpose || `REF-${p.id || idx}`,
+              status: "Confirmed"
+            }))
+          }));
+        }
+      })
+      .catch((err) => console.warn("Using baseline fallback tracking layout:", err));
+    }
+  }, [CHILD?.student_id]);
+
 
   useEffect(() => {
     const v = rootRef.current && getComputedStyle(rootRef.current).getPropertyValue("--payx-navy").trim();
@@ -151,29 +192,62 @@ export default function PaymentStatus() {
     setConfirming(true);
   };
 
-  const confirmPay = () => {
+    const confirmPay = async () => {
     setPaying(true);
-    // ---- Ready to enable once the backend is live. ----
-    // fetch("http://localhost:5000/api/payments/pay", { method: "POST", ... })
-    setTimeout(() => {
-      const m = METHODS[form.method];
+    setForm(f => ({ ...f, error: "" }));
+
+    const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
+    const token = localStorage.getItem("parent_token");
+    const m = METHODS[form.method];
+    const generatedRef = `${m.prefix}-${Math.floor(10000000 + Math.random() * 89999999)}`;
+
+    try {
+      // 1. Send transaction array to your Flask payments router endpoint
+      const res = await fetch(`${API_URL}/api/payments/pay`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          student_id: CHILD?.student_id || "ST001",
+          amount: amountNum,
+          method: m.label,
+          purpose: generatedRef, // Binds generated reference payload string as payment log purpose
+          year: 2026,
+          term: "Term 3"
+        })
+      });
+
+      const result = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(result.error || result.message || "Payment routing failed.");
+      }
+
+      // 2. Append real instance safely into state arrays on success
       const payment = {
-        id: `p${Date.now()}`,
+        id: result.id || `p${Date.now()}`,
         date: todayIso(),
         amount: amountNum,
         method: m.label,
-        reference: `${m.prefix}-${Math.floor(10000000 + Math.random() * 89999999)}`,
-        status: "Awaiting confirmation",
+        reference: generatedRef,
+        status: "Confirmed", // Sets directly to confirmed since your local table supports instant execution rows
         itemId: form.itemId,
       };
+
       setRecord((r) => ({ ...r, payments: [...r.payments, payment] }));
-      setNotice(`Payment of ${money(amountNum)} started. Reference ${payment.reference}. ` + (form.method === "mobile" ? "Check your phone and approve with your Mobile Money PIN." : "Complete the secure card step to finish."));
+      setNotice(`Payment of ${money(amountNum)} written successfully into school ledger database! Reference: ${generatedRef}`);
       setForm(EMPTY_FORM);
+      setFilter("all");
+    } catch (err) {
+      setForm(f => ({ ...f, error: err.message || "Unable to process payment connection." }));
+    } finally {
       setPaying(false);
       setConfirming(false);
-      setFilter("all");
-    }, 1200);
+    }
   };
+
 
   /* Re-check awaiting payments. On the real system the aggregator calls
      your backend when a payment succeeds, and this just reloads the data. */
@@ -229,7 +303,8 @@ export default function PaymentStatus() {
           <header className="payx-header">
             <div className="payx-header-text">
               <h1 className="payx-title">Payment Status</h1>
-              <p className="payx-sub">{CHILD.student_name} · {CHILD.class_name} · {CHILD.term}</p>
+              <p className="payx-sub">{CHILD.student_name} · {CHILD.student_class || CHILD.class_name} · {CHILD.term}</p>
+
             </div>
             <div className="payx-header-chip">
               <span>{summary.percent}%</span>

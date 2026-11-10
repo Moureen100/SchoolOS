@@ -1,9 +1,9 @@
-
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { AUTH_CONFIG } from "./authConfig";
 import "./Login.css";
+import ParentLoginForm from "../parent/ParentLoginForm"; // Make sure this path correctly points to your ParentLoginForm.jsx
 
 const API_URL = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
 
@@ -19,7 +19,7 @@ const TEACHER_LOGIN_ROLES = {
 
 function Hex({ className }) {
   return (
-      <span className={`lg-hex-wrap ${className}`} aria-hidden="true">
+    <span className={`lg-hex-wrap ${className}`} aria-hidden="true">
       <span className="lg-hex" />
     </span>
   );
@@ -75,7 +75,7 @@ export default function Login() {
 
         if (!res.ok || !data.success || !data.access_token) {
           throw new Error(
-              data.message || "Unable to log in. Check your administrator credentials."
+            data.message || "Unable to log in. Check your administrator credentials."
           );
         }
 
@@ -99,19 +99,19 @@ export default function Login() {
 
       if (portal) {
         const res = await fetch(
-            `${API_URL}/api/auth/teacher/login`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                role: portal,
-                portal: role,
-                email: email.trim(),
-                password,
-              }),
-            }
+          `${API_URL}/api/auth/teacher/login`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              role: portal,
+              portal: role,
+              email: email.trim(),
+              password,
+            }),
+          }
         );
 
         const data = await res.json().catch(() => ({}));
@@ -127,17 +127,17 @@ export default function Login() {
         // Class Teacher validation.
         if (role === "class-teacher" && !data.isClassTeacher) {
           throw new Error(
-              "This account is not a class teacher. Use the Teacher login instead."
+            "This account is not a class teacher. Use the Teacher login instead."
           );
         }
 
         // Bursar validation.
         if (
-            role === "bursar" &&
-            (data.user?.designation || "").trim().toLowerCase() !== "bursar"
+          role === "bursar" &&
+          (data.user?.designation || "").trim().toLowerCase() !== "bursar"
         ) {
           throw new Error(
-              "This account is not registered as a bursar. Contact your administrator."
+            "This account is not registered as a bursar. Contact your administrator."
           );
         }
 
@@ -149,13 +149,13 @@ export default function Login() {
         localStorage.setItem("role", role);
 
         localStorage.setItem(
-            "isClassTeacher",
-            String(Boolean(data.isClassTeacher))
+          "isClassTeacher",
+          String(Boolean(data.isClassTeacher))
         );
 
         localStorage.setItem(
-            "classes",
-            JSON.stringify(data.classes || [])
+          "classes",
+          JSON.stringify(data.classes || [])
         );
 
         navigate(config.dashboard);
@@ -170,9 +170,9 @@ export default function Login() {
 
     } catch (err) {
       setError(
-          err.message === "Failed to fetch"
-              ? "Cannot reach the server. Check the server URL and CORS settings."
-              : err.message || "Login failed. Please try again."
+        err.message === "Failed to fetch"
+          ? "Cannot reach the server. Check the server URL and CORS settings."
+          : err.message || "Login failed. Please try again."
       );
     } finally {
       setSubmitting(false);
@@ -182,47 +182,59 @@ export default function Login() {
   const isAdmin = role === "admin";
 
   return (
-      <div className="login-page">
-        <span className="lg-bubble lg-bubble--1" aria-hidden="true" />
-        <span className="lg-bubble lg-bubble--2" aria-hidden="true" />
-        <span className="lg-bubble lg-bubble--3" aria-hidden="true" />
+    <div className="login-page">
+      <span className="lg-bubble lg-bubble--1" aria-hidden="true" />
+      <span className="lg-bubble lg-bubble--2" aria-hidden="true" />
+      <span className="lg-bubble lg-bubble--3" aria-hidden="true" />
 
-        <Hex className="lg-hex-wrap--bg1" />
-        <Hex className="lg-hex-wrap--bg2" />
+      <Hex className="lg-hex-wrap--bg1" />
+      <Hex className="lg-hex-wrap--bg2" />
 
-        <div className="lg-card">
+      <div className="lg-card">
 
-          {/* LEFT: BRAND PANEL */}
+        {/* LEFT: BRAND PANEL */}
 
-          <section className="lg-brand-panel">
-            <div className="lg-logo">
-              <Hex className="lg-hex-wrap--logo" />
-              <span className="lg-logo-text">SchoolOS</span>
-            </div>
+        <section className="lg-brand-panel">
+          <div className="lg-logo">
+            <Hex className="lg-hex-wrap--logo" />
+            <span className="lg-logo-text">SchoolOS</span>
+          </div>
 
-            <div className="lg-art" aria-hidden="true">
-              <span className="lg-blob" />
-              <Hex className="lg-hex-wrap--main" />
-              <Hex className="lg-hex-wrap--yellow" />
-              <Hex className="lg-hex-wrap--small" />
-            </div>
+          <div className="lg-art" aria-hidden="true">
+            <span className="lg-blob" />
+            <Hex className="lg-hex-wrap--main" />
+            <Hex className="lg-hex-wrap--yellow" />
+            <Hex className="lg-hex-wrap--small" />
+          </div>
 
-            <div className="lg-brand-copy">
-              <h2>Run your whole school from one place</h2>
-              <p>
-                Students, teachers, fees and results, kept together and always
-                up to date.
-              </p>
-            </div>
-
-            <p className="lg-copyright">
-              © {new Date().getFullYear()} SchoolOS
+          <div className="lg-brand-copy">
+            <h2>Run your whole school from one place</h2>
+            <p>
+              Students, teachers, fees and results, kept together and always
+              up to date.
             </p>
-          </section>
+          </div>
 
-          {/* RIGHT: LOGIN FORM */}
+          <p className="lg-copyright">
+            © {new Date().getFullYear()} SchoolOS
+          </p>
+        </section>
 
-          <section className="lg-form-panel">
+        {/* RIGHT: LOGIN FORM */}
+
+        <section className="lg-form-panel">
+          {role === "parent" ? (
+            <div className="lg-form">
+              <h1 className="lg-title">
+                {config.label} Login
+              </h1>
+              <p className="lg-subtitle" style={{ marginBottom: 24 }}>
+                Enter your student details and registered phone number to access your portal.
+              </p>
+              
+              <ParentLoginForm />
+            </div>
+          ) : (
             <form className="lg-form" onSubmit={handleSubmit}>
 
               <h1 className="lg-title">
@@ -231,97 +243,62 @@ export default function Login() {
 
               <p className="lg-subtitle">
                 {isAdmin
-                    ? "Sign in using your administrator account credentials."
-                    : "Sign in to continue to your dashboard."}
+                  ? "Sign in using your administrator account credentials."
+                  : "Sign in to continue to your dashboard."}
               </p>
 
               {config.singleAccount && (
-                  <p className="lg-note">
-                    This role allows only one account. If you're the{" "}
-                    {config.label.toLowerCase()} and can't get in, use{" "}
-                    <Link to={`/account-recovery/${role}`}>
-                      account recovery
-                    </Link>.
-                  </p>
+                <p className="lg-note">
+                  This role allows only one account. If you're the{" "}
+                  {config.label.toLowerCase()} and can't get in, use{" "}
+                  <Link to={`/account-recovery/${role}`}>
+                    account recovery
+                  </Link>.
+                </p>
               )}
 
               <label className="lg-label" htmlFor="lg-email">
                 {isAdmin ? "Administrator Email Address" : "Email Address"}
               </label>
-
               <input
-                  id="lg-email"
-                  className="lg-input"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder={
-                    isAdmin
-                        ? "Enter your administrator email"
-                        : "Enter your email"
-                  }
-                  autoComplete="username"
-                  required
+                id="lg-email"
+                className="lg-input"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
 
               <label className="lg-label" htmlFor="lg-password">
-                {isAdmin ? "Administrator Password" : "Password"}
+                Password
               </label>
-
-              <div className="lg-input-wrap">
+              <div style={{ position: "relative" }}>
                 <input
-                    id="lg-password"
-                    className="lg-input"
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder={
-                      isAdmin
-                          ? "Enter your administrator password"
-                          : "Enter your password"
-                    }
-                    autoComplete="current-password"
-                    required
+                  id="lg-password"
+                  className="lg-input"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
                 />
-
                 <button
-                    type="button"
-                    className="lg-eye"
-                    onClick={() => setShowPassword((value) => !value)}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{ position: "absolute", right: 12, top: 12, background: "none", border: "none", color: "rgba(255,255,255,0.4)" }}
                 >
-                  {showPassword ? <FiEyeOff /> : <FiEye />}
+                  {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
                 </button>
               </div>
 
-              <button
-                  type="submit"
-                  className="lg-submit"
-                  disabled={submitting}
-              >
+              {error && <p style={{ color: "#ffb4a8", fontSize: 14 }}>{error}</p>}
+
+              <button type="submit" disabled={submitting} className="lg-submit-btn" style={{ width: "100%", padding: 13, borderRadius: 999, border: "none", background: "#fbc94a", color: "#0f1538", fontWeight: 700, fontSize: 16, cursor: "pointer", marginTop: 12 }}>
                 {submitting ? "Logging in..." : "Log in"}
               </button>
-
-              {error && (
-                  <p className="lg-error" role="alert">
-                    {error}
-                  </p>
-              )}
-
-              {config.allowSignup && (
-                  <p className="lg-footer-text">
-                    Don't have an account?{" "}
-                    <Link to={`/signup/${role}`}>Sign up</Link>
-                  </p>
-              )}
-
-              <p className="lg-back">
-                <Link to="/roles">← Choose a different portal</Link>
-              </p>
-
             </form>
-          </section>
-        </div>
+          )}
+        </section>
       </div>
+    </div>
   );
 }
